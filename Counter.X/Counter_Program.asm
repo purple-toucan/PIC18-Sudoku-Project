@@ -18,19 +18,23 @@ bdlp	decf	0x11,f		    ; Decrease least significant byte by 1
 	return			    ; Exit subroutine
 	
 start	;HARDWARE SETUP
-	movlw 	0xFF
-	movwf	TRISD, ACCESS	    ; Port D all inputs
+	
 	movlw 	0x0
 	movwf	TRISC, ACCESS	    ; Port C all outputs
+	movwf	TRISD, ACCESS	    ; Port D all outputs - Temporary
 	movwf	TRISE, ACCESS	    ; Port E all outputs
-	movwf	0x06, ACCESS	    ; Set counter to zero
+	movwf	0x06,  ACCESS	    ; Set counter to zero
+	movlw 	0x10
+	movwf	PORTD, ACCESS	    ; Initilise Port D = .16
+	movlw 	0xFF
+	movwf	TRISD, ACCESS	    ; Port D all inputs
 	bra 	loop
 	
 loop	;COUNTING LOOP
 	movff 	0x06, PORTC	    ; Set Port C value
-	call	bdelay
+	;call	bdelay
 	incf 	0x06, F, ACCESS	    ; Incriment counter and place back in F
-	movf	PORTD, W	    ; Read Port D to W
+	movf	LATD, W		    ; Read Port D to W
 	movwf   PORTE, ACCESS	    ; Port E mirrors D
 	cpfsgt 	0x06, ACCESS	    ; Skip next line if F is greater than W
 	bra 	loop		    ; If not skipped, branch back to loop start

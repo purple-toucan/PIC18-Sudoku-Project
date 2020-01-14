@@ -1,4 +1,4 @@
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  12:54:38         PAGE  1
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  19:13:45         PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -22,26 +22,42 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00006         
                       00007         org 0x100                   ; Main code starts here at address 0x100
                       00008 
-000100                00009 start   ;HARDWARE SETUP
-000100 0EFF           00010         movlw   0xFF
-000102 6E95           00011         movwf   TRISD, ACCESS       ; Port D all inputs
-000104 0E00           00012         movlw   0x0
-000106 6E94           00013         movwf   TRISC, ACCESS       ; Port C all outputs
-000108 6E96           00014         movwf   TRISE, ACCESS       ; Port E all outputs
-00010A 6E06           00015         movwf   0x06, ACCESS        ; Set counter to zero
-00010C D???           00016         bra     loop
-                      00017         
-00010E                00018 loop    ;COUNTING LOOP
-00010E C006 FF82      00019         movff   0x06, PORTC         ; Set Port C value
-000112 2A06           00020         incf    0x06, F, ACCESS     ; Incriment counter and place back in F
-000114 5083           00021         movf    PORTD, W            ; Read Port D to W
-000116 6E84           00022         movwf   PORTE, ACCESS       ; Port E mirrors D
-000118 6406           00023         cpfsgt  0x06, ACCESS        ; Skip next line if F is greater than W
-00011A D???           00024         bra     loop                ; If not skipped, branch back to loop start
-00011C EF00 F000      00025         goto    0x0                 ; Re-run program from start
-                      00026         
-                      00027         end
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  12:54:38         PAGE  2
+000100                00009 bdelay
+000100 0EDE           00010         movlw   high(0xDEAD)        ; Load 16 bit number across 2 FRs
+000102 6E10           00011         movwf   0x10, ACCESS        
+000104 0EAD           00012         movlw   low(0xDEAD)
+000106 6E11           00013         movwf   0x11, ACCESS                
+000108 0E00           00014         movlw   0x00                ; Set W = 0
+00010A 0611           00015 bdlp    decf    0x11,f              ; Decrease least significant byte by 1
+00010C 5A10           00016         subwfb  0x10,f              ; Subtract W and borrow bit
+00010E E2??           00017         bc      bdlp                ; If carry then branch - Borrow = NOT Carry
+000110 0012           00018         return                      ; Exit subroutine
+                      00019         
+000112                00020 start   ;HARDWARE SETUP
+                      00021         
+000112 0E00           00022         movlw   0x0
+000114 6E94           00023         movwf   TRISC, ACCESS       ; Port C all outputs
+000116 6E95           00024         movwf   TRISD, ACCESS       ; Port D all outputs - Temporary
+000118 6E96           00025         movwf   TRISE, ACCESS       ; Port E all outputs
+00011A 6E06           00026         movwf   0x06,  ACCESS       ; Set counter to zero
+00011C 0E10           00027         movlw   0x10
+00011E 6E83           00028         movwf   PORTD, ACCESS       ; Initilise Port D = .16
+000120 0EFF           00029         movlw   0xFF
+000122 6E95           00030         movwf   TRISD, ACCESS       ; Port D all inputs
+000124 D???           00031         bra     loop
+                      00032         
+000126                00033 loop    ;COUNTING LOOP
+000126 C006 FF82      00034         movff   0x06, PORTC         ; Set Port C value
+                      00035         ;call   bdelay
+00012A 2A06           00036         incf    0x06, F, ACCESS     ; Incriment counter and place back in F
+00012C 508C           00037         movf    LATD, W     ; Read Port D to W
+00012E 6E84           00038         movwf   PORTE, ACCESS       ; Port E mirrors D
+000130 6406           00039         cpfsgt  0x06, ACCESS        ; Skip next line if F is greater than W
+000132 D???           00040         bra     loop                ; If not skipped, branch back to loop start
+000134 EF00 F000      00041         goto    0x0                 ; Re-run program from start
+                      00042         
+                      00043         end
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  19:13:45         PAGE  2
 
 
 SYMBOL TABLE
@@ -100,7 +116,7 @@ ADMSK5                            00000005
 ADON                              00000000
 ADRES                             00000FC3
 ADRESH                            00000FC4
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  12:54:38         PAGE  3
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  19:13:45         PAGE  3
 
 
 SYMBOL TABLE
@@ -159,7 +175,7 @@ ANSEL16                           00000000
 ANSEL17                           00000001
 ANSEL18                           00000002
 ANSEL19                           00000003
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  12:54:38         PAGE  4
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  19:13:45         PAGE  4
 
 
 SYMBOL TABLE
@@ -218,7 +234,7 @@ C1TSEL0                           00000000
 C1TSEL1                           00000001
 C1TSEL2                           00000002
 C2INA                             00000004
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  12:54:38         PAGE  5
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  19:13:45         PAGE  5
 
 
 SYMBOL TABLE
@@ -277,7 +293,7 @@ CCP1IP                            00000001
 CCP1M0                            00000000
 CCP1M1                            00000001
 CCP1M2                            00000002
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  12:54:38         PAGE  6
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  19:13:45         PAGE  6
 
 
 SYMBOL TABLE
@@ -336,7 +352,7 @@ CCP5M0                            00000000
 CCP5M1                            00000001
 CCP5M2                            00000002
 CCP5M3                            00000003
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  12:54:38         PAGE  7
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  19:13:45         PAGE  7
 
 
 SYMBOL TABLE
@@ -395,7 +411,7 @@ CCP9IP                            00000006
 CCP9M0                            00000000
 CCP9M1                            00000001
 CCP9M2                            00000002
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  12:54:38         PAGE  8
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  19:13:45         PAGE  8
 
 
 SYMBOL TABLE
@@ -454,7 +470,7 @@ CHSN1                             00000001
 CHSN2                             00000002
 CK1                               00000006
 CK2                               00000001
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  12:54:38         PAGE  9
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  19:13:45         PAGE  9
 
 
 SYMBOL TABLE
@@ -513,7 +529,7 @@ CTMUIE                            00000003
 CTMUIF                            00000003
 CTMUIP                            00000003
 CTMUMD                            00000006
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  12:54:38         PAGE 10
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  19:13:45         PAGE 10
 
 
 SYMBOL TABLE
@@ -572,7 +588,7 @@ ECCP1AS1                          00000005
 ECCP1AS2                          00000006
 ECCP1ASE                          00000007
 ECCP1CON                          00000FBB
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  12:54:38         PAGE 11
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  19:13:45         PAGE 11
 
 
 SYMBOL TABLE
@@ -631,7 +647,7 @@ FSR2H                             00000FDA
 FSR2L                             00000FD9
 GCEN                              00000007
 GIE                               00000007
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  12:54:38         PAGE 12
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  19:13:45         PAGE 12
 
 
 SYMBOL TABLE
@@ -690,7 +706,7 @@ INT3F                             00000002
 INT3IE                            00000005
 INT3IF                            00000002
 INT3IP                            00000001
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  12:54:38         PAGE 13
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  19:13:45         PAGE 13
 
 
 SYMBOL TABLE
@@ -749,7 +765,7 @@ LATB7                             00000007
 LATC                              00000F8B
 LATC0                             00000000
 LATC1                             00000001
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  12:54:38         PAGE 14
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  19:13:45         PAGE 14
 
 
 SYMBOL TABLE
@@ -808,7 +824,7 @@ LATJ1                             00000001
 LATJ2                             00000002
 LATJ3                             00000003
 LATJ4                             00000004
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  12:54:38         PAGE 15
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  19:13:45         PAGE 15
 
 
 SYMBOL TABLE
@@ -867,7 +883,7 @@ OE                                00000001
 OERR                              00000001
 OERR1                             00000001
 OERR2                             00000001
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  12:54:38         PAGE 16
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  19:13:45         PAGE 16
 
 
 SYMBOL TABLE
@@ -926,7 +942,7 @@ P3M1                              00000007
 P3RSEN                            00000007
 PA3                               00000000
 PADCFG1                           00000F53
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  12:54:38         PAGE 17
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  19:13:45         PAGE 17
 
 
 SYMBOL TABLE
@@ -985,7 +1001,7 @@ POSTDEC2                          00000FDD
 POSTINC0                          00000FEE
 POSTINC1                          00000FE6
 POSTINC2                          00000FDE
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  12:54:38         PAGE 18
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  19:13:45         PAGE 18
 
 
 SYMBOL TABLE
@@ -1044,7 +1060,7 @@ RA4                               00000004
 RA5                               00000005
 RA6                               00000006
 RA7                               00000007
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  12:54:38         PAGE 19
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  19:13:45         PAGE 19
 
 
 SYMBOL TABLE
@@ -1103,7 +1119,7 @@ RD6                               00000006
 RD7                               00000007
 RDPU                              00000007
 RE0                               00000000
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  12:54:38         PAGE 20
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  19:13:45         PAGE 20
 
 
 SYMBOL TABLE
@@ -1162,7 +1178,7 @@ ROSSLP                            00000005
 RSEN                              00000001
 RTCC                              00000004
 RTCCAL                            00000F5E
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  12:54:38         PAGE 21
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  19:13:45         PAGE 21
 
 
 SYMBOL TABLE
@@ -1221,7 +1237,7 @@ SOSCI                             00000001
 SOSCO                             00000000
 SOSCRUN                           00000006
 SP0                               00000000
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  12:54:38         PAGE 22
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  19:13:45         PAGE 22
 
 
 SYMBOL TABLE
@@ -1280,7 +1296,7 @@ SSPM2                             00000002
 SSPM3                             00000003
 SSPOV                             00000006
 SSPSTAT                           00000FC7
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  12:54:38         PAGE 23
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  19:13:45         PAGE 23
 
 
 SYMBOL TABLE
@@ -1339,7 +1355,7 @@ T1GSPM                            00000004
 T1GSS0                            00000000
 T1GSS1                            00000001
 T1GTM                             00000005
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  12:54:38         PAGE 24
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  19:13:45         PAGE 24
 
 
 SYMBOL TABLE
@@ -1398,7 +1414,7 @@ T6OUTPS3                          00000006
 T7CKI                             00000004
 T7CKPS0                           00000004
 T7CKPS1                           00000005
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  12:54:38         PAGE 25
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  19:13:45         PAGE 25
 
 
 SYMBOL TABLE
@@ -1457,7 +1473,7 @@ TMR1GIP                           00000002
 TMR1H                             00000FCF
 TMR1IE                            00000000
 TMR1IF                            00000000
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  12:54:38         PAGE 26
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  19:13:45         PAGE 26
 
 
 SYMBOL TABLE
@@ -1516,7 +1532,7 @@ TMR6ON                            00000002
 TMR7                              00000F3E
 TMR7CS0                           00000006
 TMR7CS1                           00000007
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  12:54:38         PAGE 27
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  19:13:45         PAGE 27
 
 
 SYMBOL TABLE
@@ -1575,7 +1591,7 @@ TRISC6                            00000006
 TRISC7                            00000007
 TRISD                             00000F95
 TRISD0                            00000000
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  12:54:38         PAGE 28
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  19:13:45         PAGE 28
 
 
 SYMBOL TABLE
@@ -1634,7 +1650,7 @@ TRMT1                             00000001
 TRMT2                             00000001
 TUN0                              00000000
 TUN1                              00000001
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  12:54:38         PAGE 29
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  19:13:45         PAGE 29
 
 
 SYMBOL TABLE
@@ -1693,7 +1709,7 @@ W                                 00000000
 WAIT0                             00000004
 WAIT1                             00000005
 WCOL                              00000007
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  12:54:38         PAGE 30
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  19:13:45         PAGE 30
 
 
 SYMBOL TABLE
@@ -1752,7 +1768,7 @@ _CP1_ON_5L                        000000FD
 _CP2_OFF_5L                       000000FF
 _CP2_ON_5L                        000000FB
 _CP3_OFF_5L                       000000FF
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  12:54:38         PAGE 31
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  19:13:45         PAGE 31
 
 
 SYMBOL TABLE
@@ -1811,7 +1827,7 @@ _FOSC_INTIO1_1H                   000000F9
 _FOSC_INTIO2_1H                   000000F8
 _FOSC_LP_1H                       000000F0
 _FOSC_RCIO_1H                     000000F7
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  12:54:38         PAGE 32
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  19:13:45         PAGE 32
 
 
 SYMBOL TABLE
@@ -1870,7 +1886,7 @@ _WDTPS_32_2H                      00000097
 _WDTPS_4096_2H                    000000B3
 _WDTPS_4_2H                       0000008B
 _WDTPS_512_2H                     000000A7
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  12:54:38         PAGE 33
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-14-2020  19:13:45         PAGE 33
 
 
 SYMBOL TABLE
@@ -1906,8 +1922,10 @@ _WRTD_ON_6H                       0000007F
 _XINST_OFF_1L                     000000BF
 _XINST_ON_1L                      000000FF
 __18F87K22                        00000001
-loop                              0000010E
-start                             00000100
+bdelay                            00000100
+bdlp                              0000010A
+loop                              00000126
+start                             00000112
 
 Errors   :     0
 Warnings :     0 reported,     0 suppressed
