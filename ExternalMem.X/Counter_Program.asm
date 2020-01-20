@@ -7,9 +7,9 @@
 	org 0x100		    ; Main code starts here at address 0x100
 
 bdelay
-	movlw	high(0x0001)	    ; Load 16 bit number across 2 FRs
+	movlw	high(0xFFFF)	    ; Load 16 bit number across 2 FRs
 	movwf	0x10, ACCESS	    
-	movlw	low(0x0001)
+	movlw	low(0xFFFF)
 	movwf	0x11, ACCESS		    
 	movlw	0x00		    ; Set W = 0
 bdlp	decf	0x11,f		    ; Decrease least significant byte by 1
@@ -36,11 +36,13 @@ clock2
 	return	
 	
 write
-	movwf	LATE		    ; Store W
+	movwf	0x13		    ; Temp storage
 	movlw	0x5	    
 	movwf	PORTD		    ; Set chip outputs off
 	movlw	0x00		    
 	movwf	TRISE, ACCESS	    ; Set TRISE to output
+	movf	0x13, W
+	movwf	PORTE		    ; Ouput initial W
 	return	
 	
 read1
@@ -50,10 +52,10 @@ read1
 	movwf	PORTD		    ; Output enable chip 1
 	call	bdelay
 	movf	PORTE, W	    ; Load E to W
-	movwf	0x10, ACCESS	    ; Temp data storage
+	movwf	0x12, ACCESS	    ; Temp data storage
 	movlw	0x5	    
 	movwf	PORTD		    ; Output disable chip 1
-	movf	0x10, ACCESS, W	    ; Load E Output back onto W
+	movf	0x12, ACCESS, W	    ; Load E Output back onto W
 	
 	return	
 	
@@ -64,10 +66,10 @@ read2
 	movwf	PORTD		    ; Output enable chip 2
 	call	bdelay
 	movf	PORTE, W	    ; Load E to W
-	movwf	0x10, ACCESS	    ; Temp data storage
+	movwf	0x12, ACCESS	    ; Temp data storage
 	movlw	0x5	    
 	movwf	PORTD		    ; Output disable chip 2
-	movf	0x10, ACCESS, W	    ; Load E Output back onto W
+	movf	0x12, ACCESS, W	    ; Load E Output back onto W
 	
 	return	
 	
@@ -79,12 +81,44 @@ start	;HARDWARE SETUP
 	movwf	PORTD, ACCESS	    ; Set OE high (disable chip output)
 	movlw	0xFF		    
 	movwf	TRISE, ACCESS	    ; Set TRISE to input
+
+	movlw	0x00
+	movwf	TRISH, ACCESS	    ; PORTH ouput
+	movwf	PORTH, ACCESS	    ; PORTH ouput
 	
 	movlw	0x00
-	movwf	TRISH, ACCESS	    ; PORTF ouput
-loop	
-	call	read2
-	movwf	PORTH
+	movwf	TRISJ, ACCESS	    ; PORTJ ouput
+	movwf	PORTJ, ACCESS	    ; PORTH ouput
+
+    loop
+    
+	movlw	0x10
+	call	write
+	call	bdelay
+	call	clock1		    ; Write onto chip 1
+	call	bdelay
+	
+	movlw	0x00		    ; Clear W
+	
+	movlw	0xFF
+	call	write
+	call	bdelay
+	call	clock2		    ; Write onto chip 2
+	call	bdelay
+	
+	movlw	0x00		    ; Clear W
+
+	call	read1		    ; Read Chip 1 
+	movwf	PORTH		    ; Write Chip 1 to H
+	call	bdelay
+	
+	movlw	0x00		    ; Clear W
+
+	call	read2		    ; Read Chip 2
+	movwf	PORTJ		    ; Write Chip 2 to J
+	call	bdelay
+	
+	bra	loop
 	
 	goto 	0x0
 	end
