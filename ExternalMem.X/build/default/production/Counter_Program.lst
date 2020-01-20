@@ -1,4 +1,4 @@
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-17-2020  12:39:10         PAGE  1
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-20-2020  13:31:09         PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -23,9 +23,9 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00007         org 0x100                   ; Main code starts here at address 0x100
                       00008 
 000100                00009 bdelay
-000100 0E00           00010         movlw   high(0x0001)        ; Load 16 bit number across 2 FRs
+000100 0EFF           00010         movlw   high(0xFFFF)        ; Load 16 bit number across 2 FRs
 000102 6E10           00011         movwf   0x10, ACCESS        
-000104 0E01           00012         movlw   low(0x0001)
+000104 0EFF           00012         movlw   low(0xFFFF)
 000106 6E11           00013         movwf   0x11, ACCESS                
 000108 0E00           00014         movlw   0x00                ; Set W = 0
 00010A 0611           00015 bdlp    decf    0x11,f              ; Decrease least significant byte by 1
@@ -52,62 +52,106 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 000134 0012           00036         return  
                       00037         
 000136                00038 write
-000136 6E8D           00039         movwf   LATE                ; Store W
+000136 6E13           00039         movwf   0x13                ; Temp storage
 000138 0E05           00040         movlw   0x5         
 00013A 6E83           00041         movwf   PORTD               ; Set chip outputs off
 00013C 0E00           00042         movlw   0x00                
 00013E 6E96           00043         movwf   TRISE, ACCESS       ; Set TRISE to output
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-17-2020  12:39:10         PAGE  2
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-20-2020  13:31:09         PAGE  2
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-000140 0012           00044         return  
-                      00045         
-000142                00046 read1
-000142 0EFF           00047         movlw   0xFF                
-000144 6E96           00048         movwf   TRISE, ACCESS       ; Set TRISE to input
-000146 0E01           00049         movlw   0x1
-000148 6E83           00050         movwf   PORTD               ; Output enable chip 1
-00014A EC?? F???      00051         call    bdelay
-00014E 0E05           00052         movlw   0x5         
-000150 6E83           00053         movwf   PORTD               ; Output disable chip 1
+000140 5013           00044         movf    0x13, W
+000142 6E84           00045         movwf   PORTE               ; Ouput initial W
+000144 0012           00046         return  
+                      00047         
+000146                00048 read1
+000146 0EFF           00049         movlw   0xFF                
+000148 6E96           00050         movwf   TRISE, ACCESS       ; Set TRISE to input
+00014A 0E01           00051         movlw   0x1
+00014C 6E83           00052         movwf   PORTD               ; Output enable chip 1
+00014E EC?? F???      00053         call    bdelay
 000152 5084           00054         movf    PORTE, W            ; Load E to W
-000154 0012           00055         return  
-                      00056         
-000156                00057 read2
-000156 0EFF           00058         movlw   0xFF                
-000158 6E96           00059         movwf   TRISE, ACCESS       ; Set TRISE to input
-00015A 0E04           00060         movlw   0x4   
-00015C 6E83           00061         movwf   PORTD               ; Output enable chip 2
-00015E EC?? F???      00062         call    bdelay
-000162 5084           00063         movf    PORTE, W            ; Load E to W
-000164 6E10           00064         movwf   0x10, ACCESS        ; Temp data storage
-000166 0E05           00065         movlw   0x5         
-000168 6E83           00066         movwf   PORTD               ; Output disable chip 2
-00016A 5010           00067         movf    0x10, ACCESS, W     ; Load E Output back onto W
-                      00068         
-00016C 0012           00069         return  
-                      00070         
-                      00071         
-00016E                00072 start   ;HARDWARE SETUP
-00016E 0E00           00073         movlw   0x00
-000170 6E95           00074         movwf   TRISD, ACCESS       ; PORTD ouput
-000172 0E05           00075         movlw   0x5
-000174 6E83           00076         movwf   PORTD, ACCESS       ; Set OE high (disable chip output)
-000176 0EFF           00077         movlw   0xFF                
-000178 6E96           00078         movwf   TRISE, ACCESS       ; Set TRISE to input
-                      00079         
-00017A 0E00           00080         movlw   0x00
-00017C 6E99           00081         movwf   TRISH, ACCESS       ; PORTF ouput
-00017E                00082 loop    
-00017E EC?? F???      00083         call    read2
-000182 6E87           00084         movwf   PORTH
-                      00085         
-000184 EF00 F000      00086         goto    0x0
-                      00087         end
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-17-2020  12:39:10         PAGE  3
+000154 6E12           00055         movwf   0x12, ACCESS        ; Temp data storage
+000156 0E05           00056         movlw   0x5         
+000158 6E83           00057         movwf   PORTD               ; Output disable chip 1
+00015A 5012           00058         movf    0x12, ACCESS, W     ; Load E Output back onto W
+                      00059         
+00015C 0012           00060         return  
+                      00061         
+00015E                00062 read2
+00015E 0EFF           00063         movlw   0xFF                
+000160 6E96           00064         movwf   TRISE, ACCESS       ; Set TRISE to input
+000162 0E04           00065         movlw   0x4   
+000164 6E83           00066         movwf   PORTD               ; Output enable chip 2
+000166 EC?? F???      00067         call    bdelay
+00016A 5084           00068         movf    PORTE, W            ; Load E to W
+00016C 6E12           00069         movwf   0x12, ACCESS        ; Temp data storage
+00016E 0E05           00070         movlw   0x5         
+000170 6E83           00071         movwf   PORTD               ; Output disable chip 2
+000172 5012           00072         movf    0x12, ACCESS, W     ; Load E Output back onto W
+                      00073         
+000174 0012           00074         return  
+                      00075         
+                      00076         
+000176                00077 start   ;HARDWARE SETUP
+000176 0E00           00078         movlw   0x00
+000178 6E95           00079         movwf   TRISD, ACCESS       ; PORTD ouput
+00017A 0E05           00080         movlw   0x5
+00017C 6E83           00081         movwf   PORTD, ACCESS       ; Set OE high (disable chip output)
+00017E 0EFF           00082         movlw   0xFF                
+000180 6E96           00083         movwf   TRISE, ACCESS       ; Set TRISE to input
+                      00084 
+000182 0E00           00085         movlw   0x00
+000184 6E99           00086         movwf   TRISH, ACCESS       ; PORTH ouput
+000186 6E87           00087         movwf   PORTH, ACCESS       ; PORTH ouput
+                      00088         
+000188 0E00           00089         movlw   0x00
+00018A 6E9A           00090         movwf   TRISJ, ACCESS       ; PORTJ ouput
+00018C 6E88           00091         movwf   PORTJ, ACCESS       ; PORTH ouput
+                      00092 
+Warning[207]: Found label after column 1. (loop)
+00018E                00093     loop
+                      00094     
+00018E 0E10           00095         movlw   0x10
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-20-2020  13:31:09         PAGE  3
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+000190 EC?? F???      00096         call    write
+000194 EC?? F???      00097         call    bdelay
+000198 EC?? F???      00098         call    clock1              ; Write onto chip 1
+00019C EC?? F???      00099         call    bdelay
+                      00100         
+0001A0 0E00           00101         movlw   0x00                ; Clear W
+                      00102         
+0001A2 0EFF           00103         movlw   0xFF
+0001A4 EC?? F???      00104         call    write
+0001A8 EC?? F???      00105         call    bdelay
+0001AC EC?? F???      00106         call    clock2              ; Write onto chip 2
+0001B0 EC?? F???      00107         call    bdelay
+                      00108         
+0001B4 0E00           00109         movlw   0x00                ; Clear W
+                      00110 
+0001B6 EC?? F???      00111         call    read1               ; Read Chip 1 
+0001BA 6E87           00112         movwf   PORTH               ; Write Chip 1 to H
+0001BC EC?? F???      00113         call    bdelay
+                      00114         
+0001C0 0E00           00115         movlw   0x00                ; Clear W
+                      00116 
+0001C2 EC?? F???      00117         call    read2               ; Read Chip 2
+0001C6 6E88           00118         movwf   PORTJ               ; Write Chip 2 to J
+0001C8 EC?? F???      00119         call    bdelay
+                      00120         
+0001CC D???           00121         bra     loop
+                      00122         
+0001CE EF00 F000      00123         goto    0x0
+                      00124         end
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-20-2020  13:31:09         PAGE  4
 
 
 SYMBOL TABLE
@@ -166,7 +210,7 @@ ADMSK5                            00000005
 ADON                              00000000
 ADRES                             00000FC3
 ADRESH                            00000FC4
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-17-2020  12:39:10         PAGE  4
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-20-2020  13:31:09         PAGE  5
 
 
 SYMBOL TABLE
@@ -225,7 +269,7 @@ ANSEL16                           00000000
 ANSEL17                           00000001
 ANSEL18                           00000002
 ANSEL19                           00000003
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-17-2020  12:39:10         PAGE  5
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-20-2020  13:31:09         PAGE  6
 
 
 SYMBOL TABLE
@@ -284,7 +328,7 @@ C1TSEL0                           00000000
 C1TSEL1                           00000001
 C1TSEL2                           00000002
 C2INA                             00000004
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-17-2020  12:39:10         PAGE  6
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-20-2020  13:31:09         PAGE  7
 
 
 SYMBOL TABLE
@@ -343,7 +387,7 @@ CCP1IP                            00000001
 CCP1M0                            00000000
 CCP1M1                            00000001
 CCP1M2                            00000002
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-17-2020  12:39:10         PAGE  7
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-20-2020  13:31:09         PAGE  8
 
 
 SYMBOL TABLE
@@ -402,7 +446,7 @@ CCP5M0                            00000000
 CCP5M1                            00000001
 CCP5M2                            00000002
 CCP5M3                            00000003
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-17-2020  12:39:10         PAGE  8
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-20-2020  13:31:09         PAGE  9
 
 
 SYMBOL TABLE
@@ -461,7 +505,7 @@ CCP9IP                            00000006
 CCP9M0                            00000000
 CCP9M1                            00000001
 CCP9M2                            00000002
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-17-2020  12:39:10         PAGE  9
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-20-2020  13:31:09         PAGE 10
 
 
 SYMBOL TABLE
@@ -520,7 +564,7 @@ CHSN1                             00000001
 CHSN2                             00000002
 CK1                               00000006
 CK2                               00000001
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-17-2020  12:39:10         PAGE 10
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-20-2020  13:31:09         PAGE 11
 
 
 SYMBOL TABLE
@@ -579,7 +623,7 @@ CTMUIE                            00000003
 CTMUIF                            00000003
 CTMUIP                            00000003
 CTMUMD                            00000006
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-17-2020  12:39:10         PAGE 11
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-20-2020  13:31:09         PAGE 12
 
 
 SYMBOL TABLE
@@ -638,7 +682,7 @@ ECCP1AS1                          00000005
 ECCP1AS2                          00000006
 ECCP1ASE                          00000007
 ECCP1CON                          00000FBB
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-17-2020  12:39:10         PAGE 12
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-20-2020  13:31:09         PAGE 13
 
 
 SYMBOL TABLE
@@ -697,7 +741,7 @@ FSR2H                             00000FDA
 FSR2L                             00000FD9
 GCEN                              00000007
 GIE                               00000007
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-17-2020  12:39:10         PAGE 13
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-20-2020  13:31:09         PAGE 14
 
 
 SYMBOL TABLE
@@ -756,7 +800,7 @@ INT3F                             00000002
 INT3IE                            00000005
 INT3IF                            00000002
 INT3IP                            00000001
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-17-2020  12:39:10         PAGE 14
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-20-2020  13:31:09         PAGE 15
 
 
 SYMBOL TABLE
@@ -815,7 +859,7 @@ LATB7                             00000007
 LATC                              00000F8B
 LATC0                             00000000
 LATC1                             00000001
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-17-2020  12:39:10         PAGE 15
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-20-2020  13:31:09         PAGE 16
 
 
 SYMBOL TABLE
@@ -874,7 +918,7 @@ LATJ1                             00000001
 LATJ2                             00000002
 LATJ3                             00000003
 LATJ4                             00000004
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-17-2020  12:39:10         PAGE 16
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-20-2020  13:31:09         PAGE 17
 
 
 SYMBOL TABLE
@@ -933,7 +977,7 @@ OE                                00000001
 OERR                              00000001
 OERR1                             00000001
 OERR2                             00000001
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-17-2020  12:39:10         PAGE 17
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-20-2020  13:31:09         PAGE 18
 
 
 SYMBOL TABLE
@@ -992,7 +1036,7 @@ P3M1                              00000007
 P3RSEN                            00000007
 PA3                               00000000
 PADCFG1                           00000F53
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-17-2020  12:39:10         PAGE 18
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-20-2020  13:31:09         PAGE 19
 
 
 SYMBOL TABLE
@@ -1051,7 +1095,7 @@ POSTDEC2                          00000FDD
 POSTINC0                          00000FEE
 POSTINC1                          00000FE6
 POSTINC2                          00000FDE
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-17-2020  12:39:10         PAGE 19
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-20-2020  13:31:09         PAGE 20
 
 
 SYMBOL TABLE
@@ -1110,7 +1154,7 @@ RA4                               00000004
 RA5                               00000005
 RA6                               00000006
 RA7                               00000007
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-17-2020  12:39:10         PAGE 20
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-20-2020  13:31:09         PAGE 21
 
 
 SYMBOL TABLE
@@ -1169,7 +1213,7 @@ RD6                               00000006
 RD7                               00000007
 RDPU                              00000007
 RE0                               00000000
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-17-2020  12:39:10         PAGE 21
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-20-2020  13:31:09         PAGE 22
 
 
 SYMBOL TABLE
@@ -1228,7 +1272,7 @@ ROSSLP                            00000005
 RSEN                              00000001
 RTCC                              00000004
 RTCCAL                            00000F5E
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-17-2020  12:39:10         PAGE 22
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-20-2020  13:31:09         PAGE 23
 
 
 SYMBOL TABLE
@@ -1287,7 +1331,7 @@ SOSCI                             00000001
 SOSCO                             00000000
 SOSCRUN                           00000006
 SP0                               00000000
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-17-2020  12:39:10         PAGE 23
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-20-2020  13:31:09         PAGE 24
 
 
 SYMBOL TABLE
@@ -1346,7 +1390,7 @@ SSPM2                             00000002
 SSPM3                             00000003
 SSPOV                             00000006
 SSPSTAT                           00000FC7
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-17-2020  12:39:10         PAGE 24
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-20-2020  13:31:09         PAGE 25
 
 
 SYMBOL TABLE
@@ -1405,7 +1449,7 @@ T1GSPM                            00000004
 T1GSS0                            00000000
 T1GSS1                            00000001
 T1GTM                             00000005
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-17-2020  12:39:10         PAGE 25
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-20-2020  13:31:09         PAGE 26
 
 
 SYMBOL TABLE
@@ -1464,7 +1508,7 @@ T6OUTPS3                          00000006
 T7CKI                             00000004
 T7CKPS0                           00000004
 T7CKPS1                           00000005
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-17-2020  12:39:10         PAGE 26
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-20-2020  13:31:09         PAGE 27
 
 
 SYMBOL TABLE
@@ -1523,7 +1567,7 @@ TMR1GIP                           00000002
 TMR1H                             00000FCF
 TMR1IE                            00000000
 TMR1IF                            00000000
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-17-2020  12:39:10         PAGE 27
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-20-2020  13:31:09         PAGE 28
 
 
 SYMBOL TABLE
@@ -1582,7 +1626,7 @@ TMR6ON                            00000002
 TMR7                              00000F3E
 TMR7CS0                           00000006
 TMR7CS1                           00000007
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-17-2020  12:39:10         PAGE 28
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-20-2020  13:31:09         PAGE 29
 
 
 SYMBOL TABLE
@@ -1641,7 +1685,7 @@ TRISC6                            00000006
 TRISC7                            00000007
 TRISD                             00000F95
 TRISD0                            00000000
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-17-2020  12:39:10         PAGE 29
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-20-2020  13:31:09         PAGE 30
 
 
 SYMBOL TABLE
@@ -1700,7 +1744,7 @@ TRMT1                             00000001
 TRMT2                             00000001
 TUN0                              00000000
 TUN1                              00000001
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-17-2020  12:39:10         PAGE 30
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-20-2020  13:31:09         PAGE 31
 
 
 SYMBOL TABLE
@@ -1759,7 +1803,7 @@ W                                 00000000
 WAIT0                             00000004
 WAIT1                             00000005
 WCOL                              00000007
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-17-2020  12:39:10         PAGE 31
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-20-2020  13:31:09         PAGE 32
 
 
 SYMBOL TABLE
@@ -1818,7 +1862,7 @@ _CP1_ON_5L                        000000FD
 _CP2_OFF_5L                       000000FF
 _CP2_ON_5L                        000000FB
 _CP3_OFF_5L                       000000FF
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-17-2020  12:39:10         PAGE 32
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-20-2020  13:31:09         PAGE 33
 
 
 SYMBOL TABLE
@@ -1877,7 +1921,7 @@ _FOSC_INTIO1_1H                   000000F9
 _FOSC_INTIO2_1H                   000000F8
 _FOSC_LP_1H                       000000F0
 _FOSC_RCIO_1H                     000000F7
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-17-2020  12:39:10         PAGE 33
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-20-2020  13:31:09         PAGE 34
 
 
 SYMBOL TABLE
@@ -1936,7 +1980,7 @@ _WDTPS_32_2H                      00000097
 _WDTPS_4096_2H                    000000B3
 _WDTPS_4_2H                       0000008B
 _WDTPS_512_2H                     000000A7
-MPASM 5.81               COUNTER_PROGRAM.ASM   1-17-2020  12:39:10         PAGE 34
+MPASM 5.81               COUNTER_PROGRAM.ASM   1-20-2020  13:31:09         PAGE 35
 
 
 SYMBOL TABLE
@@ -1976,14 +2020,14 @@ bdelay                            00000100
 bdlp                              0000010A
 clock1                            00000112
 clock2                            00000124
-loop                              0000017E
-read1                             00000142
-read2                             00000156
-start                             0000016E
+loop                              0000018E
+read1                             00000146
+read2                             0000015E
+start                             00000176
 write                             00000136
 
 Errors   :     0
-Warnings :     0 reported,     0 suppressed
+Warnings :     1 reported,     0 suppressed
 Messages :     0 reported,     0 suppressed
 
 
