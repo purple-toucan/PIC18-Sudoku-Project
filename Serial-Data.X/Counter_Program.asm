@@ -50,14 +50,30 @@ Wait_Transmit ; Wait for transmission to complete
 
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 start
-	call	SPI_MasterInit
-loop
 	movlw	0xFF
+	movwf	TRISJ
+	call	SPI_MasterInit
+
+loop
+	movlw	0xBB
 	call	SPI_MasterTransmit
 	call	Wait_Transmit
 	
+	call	bdelay
+	call	bdelay
+	call	bdelay
+	call	bdelay
+	call	bdelay
+	call	bdelay
+	call	bdelay
+	call	bdelay
+	call	bdelay
+	call	bdelay
+	call	bdelay
+	call	bdelay
+	call	bdelay
 	bra	loop
+
 	
-	goto 	0x0
 	end
 	
