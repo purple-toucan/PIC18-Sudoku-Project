@@ -1,7 +1,9 @@
 	#include p18f87k22.inc
 
 	extern	UART_Setup, UART_Transmit_Message  ; external UART subroutines
-	extern  LCD_Setup, LCD_Write_Message	    ; external LCD subroutines
+	extern  LCD_Setup, LCD_Write_Message    ; external LCD subroutines
+	extern	LCD_Send_Byte_I, Line1
+	extern	LCD_Send_Byte_D, Line2
 	
 acs0	udata_acs   ; reserve data space in access ram
 counter	    res 1   ; reserve one byte for a counter variable
@@ -15,8 +17,8 @@ rst	code	0    ; reset vector
 
 pdata	code    ; a section of programme memory for storing data
 	; ******* myTable, data in programme memory, and its length *****
-myTable data	    "Hello World!\n"	; message, plus carriage return
-	constant    myTable_l=.13	; length of data
+myTable data	    "Buchmueller\n"	; message, plus carriage return
+	constant    myTable_l=.12	; length of data
 	
 main	code
 	; ******* Programme FLASH read Setup Code ***********************
@@ -40,10 +42,37 @@ loop 	tblrd*+			; one byte from PM to TABLAT, increment TBLPRT
 	movff	TABLAT, POSTINC0; move data from TABLAT to (FSR0), inc FSR0	
 	decfsz	counter		; count down to zero
 	bra	loop		; keep going until finished
-		
+	
+;	movlw	b'10000000'
+;	call	LCD_Send_Byte_I
+;	
+;	movlw	0x32
+;	call	LCD_Send_Byte_D
+	
+	
+	call	Line1
+	
 	movlw	myTable_l-1	; output message to LCD (leave out "\n")
 	lfsr	FSR2, myArray
 	call	LCD_Write_Message
+	
+	call	Line2
+	
+	movlw	myTable_l-1	; output message to LCD (leave out "\n")
+	lfsr	FSR2, myArray
+	call	LCD_Write_Message
+	
+	
+;	movlw	b'11000000'
+;	call	LCD_Send_Byte_I
+;	
+;	movlw	0x32
+;	call	LCD_Send_Byte_D
+;	
+;	movlw	myTable_l-1	; output message to LCD (leave out "\n")
+;	lfsr	FSR2, myArray
+;	call	LCD_Write_Message
+	
 	
 	movlw	myTable_l	; output message to UART
 	lfsr	FSR2, myArray
