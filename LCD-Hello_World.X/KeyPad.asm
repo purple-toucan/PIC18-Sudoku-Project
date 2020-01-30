@@ -1,5 +1,6 @@
 #include p18f87k22.inc
 
+    global  PadSetup, ReadPad
 	
 ;acs0    udata_acs   ; named variables in access ram
 ;LCD_cnt_l   res 1   ; reserve 1 byte for variable LCD_cnt_l
@@ -17,10 +18,9 @@ keypad_codes	    db 0xFF,0xBE,0x77,0xB7,0xD7,0x7B,0xBB,0xDB,0x7D,0xBD,0xDD,0x7E,
 ;corrosponding ASCII values
 ;			
 	    
-PadTemp udata_acs
-PadLoc	udata	0x200   ; reserve data anywhere in RAM (here at 0x200)
-counter	res 1		; reserve one byte for a counter variable
-Temprd	res 1		; reserve one byte for a counter variable
+PadLoc	 udata_acs	; reserve data anywhere in access RAM
+counter  res 1		; reserve one byte for a counter variable
+Temprd	 res 1		; reserve one byte for a counter variable
 PadCodes res	0x22	; reserve 34 bytes 
 			; 17 bytes of row and colum data 
 			; and 17 corrosponding ascii bytes
@@ -36,15 +36,16 @@ bdelay
 	movlw	0x00		    ; Set W = 0
 bdlp	decf	0x11,f		    ; Decrease least significant byte by 1
 	subwfb	0x10,f		    ; Subtract W and borrow bit
-	bc	bdlp		    ; If carry then branch - Borrow = NOT Carry
+ 	bc	bdlp		    ; If carry then branch - Borrow = NOT Carry
 	return			    ; Exit subroutine
 	
 PadSetup
 ;	; Setting up PORTE
 	setf	TRISE			; Tristates on
+	banksel PADCFG1
 	bsf	PADCFG1, REPU, BANKED   ; set REPU bit of given byte to 1 ;
 					; E pull ups on
-	clrf	LATE			;clear LATE
+	clrf	LATE			; clear LATE
 	
 	; Read code data form PM to RAM
 	lfsr	FSR0, PadCodes		; Load FSR0 with address in RAM	
@@ -61,8 +62,9 @@ loop 	tblrd*+				; one byte from PM to TABLAT, increment TBLPRT
 	decfsz	counter			; count down to zero
 	bra	loop			; keep going until finished
 	
-
 	return
+	
+	
 	
 ReadPad
 	movlw	0x0F		    ; Drive columns low
@@ -76,7 +78,38 @@ ReadPad
 	call	bdelay		    ; Wait
 	movf	PORTE, W	    ; Read columns
 	addwf	Temprd, F	    ; Combine with row data
-
+	
+	movff	Temprd, PORTH
+	
+	movlw	0x00		    ; Setting counter to zero
+	movwf	counter
+	
+libloop	movlw	0x10		    
+	cpfsgt	counter		    ; If counter is > than 16, no code matches
+	bra	Lib1
+	movlw	0xFF		    ; Error code and exit
+	return
+	
+Lib1	movlw	PadCodes	    ; Move address to W register
+	addwf	counter, W	    ; Adding counter to library address
+	lfsr	FSR0, PadCodes
+	
+	
+	movf	FSR0L, W		    ; Using W value to index library
+				    ; W value is now the key pad code
+	cpfseq	Temprd
+	bra	Lib2
+	movlw	PadCodes	    ; Move address to W register
+	addwf	counter, F	    ; Adding counter to library address
+	movlw	0x11
+	addwf	counter, W
+	lfsr	0, WREG
+	movf	FSR0L, W		    ; Using W value to index library
+	return
+	
+Lib2	incf	counter		    ; Current position not a match
+	bra	libloop
+	
 	return
 ;	
 	
