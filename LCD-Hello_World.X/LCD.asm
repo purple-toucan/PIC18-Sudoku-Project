@@ -1,6 +1,8 @@
 #include p18f87k22.inc
 
     global  LCD_Setup, LCD_Write_Message
+    global  LCD_Send_Byte_I, Line1
+    global  LCD_Send_Byte_D, Line2
 
 acs0    udata_acs   ; named variables in access ram
 LCD_cnt_l   res 1   ; reserve 1 byte for variable LCD_cnt_l
@@ -132,7 +134,25 @@ lcdlp1	decf 	LCD_cnt_l,F	; no carry when 0x00 -> 0xff
 	bc 	lcdlp1		; carry, then loop again
 	return			; carry reset so return
 
-
+	
+Line1
+	movlw	b'10000000'	; Comand protocal - mov to character 1 in row 1
+	call	LCD_Send_Byte_I	; Send Instruction
+	
+	movlw	0x14		
+	call	LCD_delay_x4us	; Wait 80 micro secs
+	
+	return
+	
+Line2
+	movlw	b'11000000'	; Comand protocal - mov to character 1 in row 2
+	call	LCD_Send_Byte_I	; Send Instruction
+	
+	movlw	0x14		
+	call	LCD_delay_x4us	; Wait 80 micro secs
+	
+	return
+	
     end
 
 

@@ -13,7 +13,7 @@
 ;	
     
 PMCodeTable code
-keypad_codes	    db 0xFF,0xBE,0x77,0xB7,0xD7,0x7B,0xBB,0xDB,0x7D,0xBD,0xDD,0x7E,0xDE,0xEE,0xED,0xEB,0xE7, 0x00,'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'
+keypad_codes db 0xFF,0xBE,0x77,0xB7,0xD7,0x7B,0xBB,0xDB,0x7D,0xBD,0xDD,0x7E,0xDE,0xEE,0xED,0xEB,0xE7, ' ','0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'
 ;row and colum codes for keypad: None, 0, 1, ... E, F		
 ;corrosponding ASCII values
 ;			
@@ -30,12 +30,12 @@ main	code
 	
 bdelay
 	movlw	high(0xDEAD)	    ; Load 16 bit number across 2 FRs
-	movwf	0x10, ACCESS	    
+	movwf	0x50, ACCESS	    
 	movlw	low(0xDEAD)
-	movwf	0x11, ACCESS		    
+	movwf	0x51, ACCESS		    
 	movlw	0x00		    ; Set W = 0
-bdlp	decf	0x11,f		    ; Decrease least significant byte by 1
-	subwfb	0x10,f		    ; Subtract W and borrow bit
+bdlp	decf	0x51,f		    ; Decrease least significant byte by 1
+	subwfb	0x50,f		    ; Subtract W and borrow bit
  	bc	bdlp		    ; If carry then branch - Borrow = NOT Carry
 	return			    ; Exit subroutine
 	
@@ -84,27 +84,19 @@ ReadPad
 	movlw	0x00		    ; Setting counter to zero
 	movwf	counter
 	
+	lfsr	FSR0, PadCodes
+	
 libloop	movlw	0x10		    
 	cpfsgt	counter		    ; If counter is > than 16, no code matches
 	bra	Lib1
 	movlw	0xFF		    ; Error code and exit
 	return
 	
-Lib1	movlw	PadCodes	    ; Move address to W register
-	addwf	counter, W	    ; Adding counter to library address
-	lfsr	FSR0, PadCodes
-	
-	
-	movf	FSR0L, W		    ; Using W value to index library
-				    ; W value is now the key pad code
-	cpfseq	Temprd
+Lib1	movf	POSTINC0, W	    ; Load keypad input code to w
+	cpfseq	Temprd		    ; Compair to input
 	bra	Lib2
-	movlw	PadCodes	    ; Move address to W register
-	addwf	counter, F	    ; Adding counter to library address
-	movlw	0x11
-	addwf	counter, W
-	lfsr	0, WREG
-	movf	FSR0L, W		    ; Using W value to index library
+	movlw	0x10		    ; Offset by 17 to find ACSII
+	movf	PLUSW0, W	    ; Load ASCII to W
 	return
 	
 Lib2	incf	counter		    ; Current position not a match

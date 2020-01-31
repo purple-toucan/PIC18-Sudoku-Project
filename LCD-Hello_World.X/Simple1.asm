@@ -4,10 +4,12 @@
 	extern  LCD_Setup, LCD_Write_Message    ; external LCD subroutines
 	extern	LCD_Send_Byte_I, Line1
 	extern	LCD_Send_Byte_D, Line2
+	extern	PadSetup, ReadPad
 	
 acs0	udata_acs   ; reserve data space in access ram
 counter	    res 1   ; reserve one byte for a counter variable
 delay_count res 1   ; reserve one byte for counter in the delay routine
+key_val	    res 1
 
 tables	udata	0x400    ; reserve data anywhere in RAM (here at 0x400)
 myArray res 0x80    ; reserve 128 bytes for message data
@@ -17,8 +19,8 @@ rst	code	0    ; reset vector
 
 pdata	code    ; a section of programme memory for storing data
 	; ******* myTable, data in programme memory, and its length *****
-myTable data	    "Buchmueller\n"	; message, plus carriage return
-	constant    myTable_l=.12	; length of data
+myTable data	    "Python is Better\n"	; message, plus carriage return
+	constant    myTable_l=.17	; length of data
 	
 main	code
 	; ******* Programme FLASH read Setup Code ***********************
@@ -29,7 +31,16 @@ setup	bcf	EECON1, CFGS	; point to Flash program memory
 	goto	start
 	
 	; ******* Main programme ****************************************
-start 	lfsr	FSR0, myArray	; Load FSR0 with address in RAM	
+start 	call	PadSetup	; Read in KeyPad Library
+	
+	movlw	b'00001100'
+	call	LCD_Send_Byte_I	; Turn off flashing cursor
+	
+	movlw	0x00
+	movwf	TRISJ
+	movwf	TRISH
+	
+	lfsr	FSR0, myArray	; Load FSR0 with address in RAM	
 	movlw	upper(myTable)	; address of data in PM
 	movwf	TBLPTRU		; load upper bits to TBLPTRU
 	movlw	high(myTable)	; address of data in PM
@@ -43,40 +54,28 @@ loop 	tblrd*+			; one byte from PM to TABLAT, increment TBLPRT
 	decfsz	counter		; count down to zero
 	bra	loop		; keep going until finished
 	
-;	movlw	b'10000000'
-;	call	LCD_Send_Byte_I
-;	
-;	movlw	0x32
-;	call	LCD_Send_Byte_D
-	
-	
-	call	Line1
-	
+	call	Line1		; Set LCD line 1
 	movlw	myTable_l-1	; output message to LCD (leave out "\n")
 	lfsr	FSR2, myArray
 	call	LCD_Write_Message
-	
+
+rdlp
 	call	Line2
 	
-	movlw	myTable_l-1	; output message to LCD (leave out "\n")
-	lfsr	FSR2, myArray
+	call	ReadPad
+	movwf	key_val
+	movwf	PORTJ
+	
+	movlw	0x01		; output message length
+	lfsr	FSR2, key_val
 	call	LCD_Write_Message
 	
 	
-;	movlw	b'11000000'
-;	call	LCD_Send_Byte_I
-;	
-;	movlw	0x32
-;	call	LCD_Send_Byte_D
-;	
-;	movlw	myTable_l-1	; output message to LCD (leave out "\n")
+;	movlw	myTable_l	; output message to UART
 ;	lfsr	FSR2, myArray
-;	call	LCD_Write_Message
-	
-	
-	movlw	myTable_l	; output message to UART
-	lfsr	FSR2, myArray
-	call	UART_Transmit_Message
+;	call	UART_Transmit_Message
+;	
+	bra	rdlp
 
 	goto	$		; goto current line in code
 
