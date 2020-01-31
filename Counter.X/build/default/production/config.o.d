@@ -1,3 +1,3 @@
 build/default/production/config.o:  \
-	C:/Users/Jac/MPLABXProjects/Jac-n-Dak/Counter.X/config.asm  \
+	H:/Laboratory/Year\ 3/Microprocessor\ Jac-Clone/Jac-n-Dak\ Clone/Jac-n-Dak/Counter.X/config.asm  \
 

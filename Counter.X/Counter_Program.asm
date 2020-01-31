@@ -32,9 +32,9 @@ start	;HARDWARE SETUP
 	
 loop	;COUNTING LOOP
 	movff 	0x06, PORTC	    ; Set Port C value
-	;call	bdelay
+	call	bdelay
 	incf 	0x06, F, ACCESS	    ; Incriment counter and place back in F
-	movf	LATD, W		    ; Read Port D to W
+	movf	PORTD, W		    ; Read Port D to W
 	movwf   PORTE, ACCESS	    ; Port E mirrors D
 	cpfsgt 	0x06, ACCESS	    ; Skip next line if F is greater than W
 	bra 	loop		    ; If not skipped, branch back to loop start
