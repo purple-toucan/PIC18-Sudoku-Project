@@ -57,17 +57,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=Simple1.asm config.asm UART.asm LCD.asm ADC.asm
+SOURCEFILES_QUOTED_IF_SPACED=Simple1.asm config.asm UART.asm LCD.asm ADC.asm HextoDec.asm
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/Simple1.o ${OBJECTDIR}/config.o ${OBJECTDIR}/UART.o ${OBJECTDIR}/LCD.o ${OBJECTDIR}/ADC.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/Simple1.o.d ${OBJECTDIR}/config.o.d ${OBJECTDIR}/UART.o.d ${OBJECTDIR}/LCD.o.d ${OBJECTDIR}/ADC.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/Simple1.o ${OBJECTDIR}/config.o ${OBJECTDIR}/UART.o ${OBJECTDIR}/LCD.o ${OBJECTDIR}/ADC.o ${OBJECTDIR}/HextoDec.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/Simple1.o.d ${OBJECTDIR}/config.o.d ${OBJECTDIR}/UART.o.d ${OBJECTDIR}/LCD.o.d ${OBJECTDIR}/ADC.o.d ${OBJECTDIR}/HextoDec.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/Simple1.o ${OBJECTDIR}/config.o ${OBJECTDIR}/UART.o ${OBJECTDIR}/LCD.o ${OBJECTDIR}/ADC.o
+OBJECTFILES=${OBJECTDIR}/Simple1.o ${OBJECTDIR}/config.o ${OBJECTDIR}/UART.o ${OBJECTDIR}/LCD.o ${OBJECTDIR}/ADC.o ${OBJECTDIR}/HextoDec.o
 
 # Source Files
-SOURCEFILES=Simple1.asm config.asm UART.asm LCD.asm ADC.asm
+SOURCEFILES=Simple1.asm config.asm UART.asm LCD.asm ADC.asm HextoDec.asm
 
 
 CFLAGS=
@@ -134,6 +134,14 @@ ${OBJECTDIR}/ADC.o: ADC.asm  nbproject/Makefile-${CND_CONF}.mk
 	@${DEP_GEN} -d "${OBJECTDIR}/ADC.o"
 	@${FIXDEPS} "${OBJECTDIR}/ADC.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
 	
+${OBJECTDIR}/HextoDec.o: HextoDec.asm  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/HextoDec.o.d 
+	@${RM} ${OBJECTDIR}/HextoDec.o 
+	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/HextoDec.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -d__DEBUG -d__MPLAB_DEBUGGER_ICD3=1 -q -p$(MP_PROCESSOR_OPTION)  -l\"${OBJECTDIR}/HextoDec.lst\" -e\"${OBJECTDIR}/HextoDec.err\" $(ASM_OPTIONS)    -o\"${OBJECTDIR}/HextoDec.o\" \"HextoDec.asm\" 
+	@${DEP_GEN} -d "${OBJECTDIR}/HextoDec.o"
+	@${FIXDEPS} "${OBJECTDIR}/HextoDec.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
+	
 else
 ${OBJECTDIR}/Simple1.o: Simple1.asm  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
@@ -174,6 +182,14 @@ ${OBJECTDIR}/ADC.o: ADC.asm  nbproject/Makefile-${CND_CONF}.mk
 	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/ADC.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -q -p$(MP_PROCESSOR_OPTION)  -l\"${OBJECTDIR}/ADC.lst\" -e\"${OBJECTDIR}/ADC.err\" $(ASM_OPTIONS)    -o\"${OBJECTDIR}/ADC.o\" \"ADC.asm\" 
 	@${DEP_GEN} -d "${OBJECTDIR}/ADC.o"
 	@${FIXDEPS} "${OBJECTDIR}/ADC.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
+	
+${OBJECTDIR}/HextoDec.o: HextoDec.asm  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/HextoDec.o.d 
+	@${RM} ${OBJECTDIR}/HextoDec.o 
+	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/HextoDec.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -q -p$(MP_PROCESSOR_OPTION)  -l\"${OBJECTDIR}/HextoDec.lst\" -e\"${OBJECTDIR}/HextoDec.err\" $(ASM_OPTIONS)    -o\"${OBJECTDIR}/HextoDec.o\" \"HextoDec.asm\" 
+	@${DEP_GEN} -d "${OBJECTDIR}/HextoDec.o"
+	@${FIXDEPS} "${OBJECTDIR}/HextoDec.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
 	
 endif
 
