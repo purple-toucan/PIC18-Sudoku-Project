@@ -5,7 +5,6 @@
 rst	code	0    ; reset vector
 	goto	setup
 
-
 main	code
 	; ******* Programme FLASH read Setup Code ***********************
 setup	
