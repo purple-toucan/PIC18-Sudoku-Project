@@ -1,12 +1,16 @@
 #include p18f87k22.inc
 
-    global GLCD_Setup, Test_Write
-    global Test_Write_2, Clear_Board
+    global GLCD_Setup, Clear_Board
+    global Set_Cursor_X, Set_Cursor_Y
+    global Test_Write_2, Test_Write
+    global Send_Data
+    global Write_Block, Read_Block
     
 acs0	    udata_acs   ; reserve data space in access ram
 delay_count     res 1	; reserve one byte for counter in the delay 
 test_col_count	res 1
 test_row_count	res 1
+block_count	res 1
 	
 	    	; GLCD Control Pins - PORTB
 	constant    GLCD_CS1 = 0 ; Notted - select left side
@@ -65,6 +69,37 @@ cclrlp	    ; Iterate Over Cols, Nested inside Row Iteration
 	bra	rclrlp	
 	
 	return
+	
+Write_Block ; Write block of length W of data from FSR2 to GLCD
+	bsf	LATB, GLCD_RS   ; Data
+	bcf	LATB, GLCD_RW  	; Write
+	
+	movwf	block_count	; Set Number of Columns to Write
+	
+wblp	movff	POSTINC2, PORTD ; Move FSR2 value to PORTD
+	call	E_Pulse		; Enable Pulse
+	decfsz	block_count
+	bra	wblp
+	
+	return
+	
+Read_Block ; Read block of length W of data from GLCD to FSR2
+	setf	TRISD
+	
+	bsf	LATB, GLCD_RS   ; Data
+	bsf	LATB, GLCD_RW  	; Read
+	
+	movwf	block_count	; Set Number of Columns to Read
+	
+rblp	call	E_Pulse		; Enable Pulse
+	movff	PORTD, POSTINC2 ; Move Data Value to FSR2
+	decfsz	block_count
+	bra	rblp
+	
+	clrf	TRISD
+	
+	return
+	
 	
 Test_Write			; Write Two Numbers to Board
 	
@@ -134,6 +169,16 @@ Reset_Cursor
 	movlw	b'01000000'
 	call	Send_Instr
 	
+	return
+	
+Set_Cursor_X			; Move to Row W
+	iorlw	X_Instr		; Format W as Row Command
+	call	Send_Instr
+	return
+	
+Set_Cursor_Y			; Move to Column W
+	iorlw	Y_Instr		; Format W as Column Command
+	call	Send_Instr
 	return
 
 Send_Data			; Send WREG as Data
