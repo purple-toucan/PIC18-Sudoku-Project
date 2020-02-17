@@ -4,14 +4,14 @@
 	extern Write_Block, Read_Block
 	
 	global Write_Cell, Write_Cells_Setup
-;	global number_name, invert_flag
-;	global sudoku_x, sudoku_y
+	global number_name, invert_flag
+	global sudoku_x, sudoku_y
 	
 	
 Storage	code    ; a section of programme memory for storing data
 	; ******* myTable, data in programme memory, and its length *****
-;Y_Table_PM  data 3,9,15,23,29,35,43,39
-Y_Table_PM  data 73,11,15,24,24,35,43,39
+Y_Table_PM  data 3,9,15,23,29,35,43,39
+;Y_Table_PM  data 73,11,15,24,24,35,43,39
 	    ; y adress (on GLCD) of left side pixel of 5x5 sudoku cell
 	    ; for sudoku columns 0-8
 	    constant    Y_Table_length = 9
@@ -33,16 +33,21 @@ X_LMask_Table_PM  data 0xFF,0xFF,0x0F, 0x0F,0x3F,0x00, 0xFF,0xFF,0x0F
 	    ; for suduko rows 0-8
 	    constant    X_LMask_Table_length = 9
 	    
-Shapes_PM   data 0,0,0,0,0, 0,0x40,0x7C,0,0, 0xB8,0xA8,0xA8,0xA8,0xE8, 0x88,0x88,0xA8,0xA8,0xF8, 0xE0,0x20,0x20,0x20,0xF8 ,0xE8,0xA8,0xA8,0xA8,0xB8, 0xF8,0xA8,0xA8,0xA8,0xB8, 0x80,0x80,0x98,0xA0,0xC0, 0xF8,0xA8,0xA8,0xA8,0xF8, 0xE8,0xA8,0xA8,0xA8,0xF8
-	    ; 5 bytes of storage for shape paterns for each digit 0-9
-	    constant	Shape_Table_length = 50
+;Shapes_PM   data 0,0,0,0,0, 0,0x40,0x7C,0,0, 0xB8,0xA8,0xA8,0xA8,0xE8, 0x88,0x88,0xA8,0xA8,0xF8, 0xE0,0x20,0x20,0x20,0xF8 ,0xE8,0xA8,0xA8,0xA8,0xB8, 0xF8,0xA8,0xA8,0xA8,0xB8, 0x80,0x80,0x98,0xA0,0xC0, 0xF8,0xA8,0xA8,0xA8,0xF8, 0xE8,0xA8,0xA8,0xA8,0xF8
+Shapes_PM1   data    0,0,0,0,0, 0,0x12,0x1F,0x10,0, 0x1D,0x15,0x15,0x15,0x17, 0x11,0x11,0x15,0x15,0x1F, 0x07,0x04,0x04,0x04,0x1F, 0x17,0x15,0x15,0x15,0x1D, 
+Shapes_PM2   data    0x1F,0x15,0x15,0x15,0x1D, 0x01,0x01,0x19,0x05,0x03, 0x1F,0x15,0x15,0x15,0x1F, 0x17,0x15,0x15,0x15,0x1F    
+   ; 5 bytes of storage for shape paterns for each digit 0-9
+	    constant	Shape_Table1_length = 30
+	    constant	Shape_Table2_length = 20
    
 Tables	udata	0x400    ; reserve data anywhere in RAM (here at 0x400)
 Y_Table		res Y_Table_length    ; reserve 9 bytes for Column Look Up Table
 X_Table		res X_Table_length	; reserve 27 bytes for Row Look Up Table
 X_UMask_Table	res X_UMask_Table_length ; Mask storage
 X_LMask_Table	res X_LMask_Table_length ; Mask storage
-Shapes_Table	res Shape_Table_length
+
+Tables2	udata	0x600    ; reserve data anywhere in RAM (here at 0x400)
+Shapes_Table	res Shape_Table1_length + Shape_Table2_length
 	
 acs0	    udata_acs
 number_name res 1   ; Variables to be accessed from external programs
@@ -80,10 +85,8 @@ Write_Cells_Setup
 	movlw	Y_Table_length	; bytes to read
 	movwf 	Reading_Counter	; counter register
 Yrdlp 	tblrd*+			; one byte from PM to TABLAT, increment TBLPRT
-;	movf	TABLAT, w
-;	movwf	POSTINC0
-	movff	TABLAT, FSR0; move data from TABLAT to (FSR0), inc FSR0	
-	
+	movff	TABLAT, POSTINC0; move data from TABLAT to (FSR0), inc FSR0
+	tblrd*+	
 	decfsz	Reading_Counter	; count down to zero
 	bra	Yrdlp		; keep going until finished	
 	
@@ -99,7 +102,8 @@ Yrdlp 	tblrd*+			; one byte from PM to TABLAT, increment TBLPRT
 	movlw	X_Table_length	; bytes to read
 	movwf 	Reading_Counter	; our counter register
 Xrdlp 	tblrd*+			; one byte from PM to TABLAT, increment TBLPRT
-	movff	TABLAT, POSTINC0; move data from TABLAT to (FSR0), inc FSR0	
+	movff	TABLAT, POSTINC0; move data from TABLAT to (FSR0), inc FSR0
+	tblrd*+	
 	decfsz	Reading_Counter	; count down to zero
 	bra	Xrdlp		; keep going until finished	
 	
@@ -115,7 +119,8 @@ Xrdlp 	tblrd*+			; one byte from PM to TABLAT, increment TBLPRT
 	movlw	X_UMask_Table_length	; bytes to read
 	movwf 	Reading_Counter	; our counter register
 UMrdlp 	tblrd*+			; one byte from PM to TABLAT, increment TBLPRT
-	movff	TABLAT, POSTINC0; move data from TABLAT to (FSR0), inc FSR0	
+	movff	TABLAT, POSTINC0; move data from TABLAT to (FSR0), inc FSR0
+	tblrd*+	
 	decfsz	Reading_Counter	; count down to zero
 	bra	UMrdlp		; keep going until finished	
 	
@@ -130,35 +135,46 @@ UMrdlp 	tblrd*+			; one byte from PM to TABLAT, increment TBLPRT
 	movwf 	Reading_Counter	; our counter register
 LMrdlp 	tblrd*+			; one byte from PM to TABLAT, increment TBLPRT
 	movff	TABLAT, POSTINC0; move data from TABLAT to (FSR0), inc FSR0	
+	tblrd*+	
 	decfsz	Reading_Counter	; count down to zero
 	bra	LMrdlp		; keep going until finished	
 
 	;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Read In Shape Look Up Table From PM to RAM
 	
 	lfsr	FSR0, Shapes_Table	; Load FSR0 with address in RAM	
-	movlw	upper(Shapes_PM)	; address of data in PM
+	movlw	upper(Shapes_PM1)	; address of data in PM
 	movwf	TBLPTRU		; load upper bits to TBLPTRU
-	movlw	high(Shapes_PM)	; address of data in PM
+	movlw	high(Shapes_PM1)	; address of data in PM
 	movwf	TBLPTRH		; load high byte to TBLPTRH
-	movlw	low(Shapes_PM)	; address of data in PM
+	movlw	low(Shapes_PM1)	; address of data in PM
 	movwf	TBLPTRL		; load low byte to TBLPTRL
-	movlw	Shape_Table_length	; bytes to read
+	movlw	Shape_Table1_length	; bytes to read
 	movwf 	Reading_Counter	; our counter register
-Srdlp 	tblrd*+			; one byte from PM to TABLAT, increment TBLPRT
+S1rdlp 	tblrd*+			; one byte from PM to TABLAT, increment TBLPRT
 	movff	TABLAT, POSTINC0; move data from TABLAT to (FSR0), inc FSR0	
+	tblrd*+	
 	decfsz	Reading_Counter	; count down to zero
-	bra	Srdlp		; keep going until finished	
+	bra	S1rdlp		; keep going until finished
+	
+	movlw	upper(Shapes_PM2)	; address of data in PM
+	movwf	TBLPTRU		; load upper bits to TBLPTRU
+	movlw	high(Shapes_PM2)	; address of data in PM
+	movwf	TBLPTRH		; load high byte to TBLPTRH
+	movlw	low(Shapes_PM2)	; address of data in PM
+	movwf	TBLPTRL		; load low byte to TBLPTRL
+	movlw	Shape_Table2_length	; bytes to read
+	movwf 	Reading_Counter	; our counter register
+S2rdlp 	tblrd*+			; one byte from PM to TABLAT, increment TBLPRT
+	movff	TABLAT, POSTINC0; move data from TABLAT to (FSR0), inc FSR0	
+	tblrd*+	
+	decfsz	Reading_Counter	; count down to zero
+	bra	S2rdlp		; keep going until finished	
+	
 	return
 	
 	
 Write_Cell
-	
-	movlw	0x00
-	movwf	sudoku_x
-	movlw	0x00
-	movwf	sudoku_y
-	movlw	0x05
-	movwf	number_name
+
 	
 	movf	sudoku_y, w	; Index y-look up table with sudoku_y 
 	lfsr	FSR0, Y_Table	; to find tlp_y
