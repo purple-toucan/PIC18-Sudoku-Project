@@ -10,31 +10,33 @@
 	
 Storage	code    ; a section of programme memory for storing data
 	; ******* myTable, data in programme memory, and its length *****
-Y_Table_PM  data 3,9,15,23,29,35,43,39
-;Y_Table_PM  data 73,11,15,24,24,35,43,39
+Y_Table_PM  data .3,.9,.15,.23,.29,.35,.43,.49,.55
 	    ; y adress (on GLCD) of left side pixel of 5x5 sudoku cell
 	    ; for sudoku columns 0-8
 	    constant    Y_Table_length = 9
 	    
-X_Table_PM  data 0,1,1,2,3,4,5,6,6, 5,5,1,1,3,5,5,5,1, 3,1,7,7,5,3,3,1,7
+;X_Table_PM  data 0,1,1,2,3,4,5,6,6, 5,5,1,1,3,5,5,5,1, 3,1,7,7,5,3,3,1,7
+X_Table_PM  data .0,.1,.1,.2,.3,.4,.5,.6,.6, .5,.5,.1,.1,.3,.5,.5,.5,.1, .3,.1,.7,.7,.5,.3,.3,.1,.7
 	    ; x adress (row on GLCD) of top part of 5x5 sudoku cell
 	    ; how many pixel rows are there of 5x5 shape in this upper row
 	    ; upoccupied pixel rows above 5x5 cell in upper row
 	    ; for suduko rows 0-8, 0-8, 0-8
 	    constant    X_Table_length = 27
 	    
-X_UMask_Table_PM  data 0xE0,0x83,0xFE, 0xFE,0xF8,0xE0, 0xE0,0x83,0xFE
+;X_UMask_Table_PM  data 0xE0,0x83,0xFE, 0xFE,0xF8,0xE0, 0xE0,0x83,0xFE
+X_UMask_Table_PM  data 0x07,0xC1,0x7F, 0x7F,0x1F,0x07, 0x07,0xC1,0x7F
 	    ; data masks for upper part of 5x5 cells
 	    ; for suduko rows 0-8
 	    constant    X_UMask_Table_length = 9
 	    
-X_LMask_Table_PM  data 0xFF,0xFF,0x0F, 0x0F,0x3F,0x00, 0xFF,0xFF,0x0F
+;X_LMask_Table_PM  data 0xFF,0xFF,0x0F, 0x0F,0x3F,0x00, 0xFF,0xFF,0x0F
+X_LMask_Table_PM  data 0xFF,0xFF,0xF0, 0xF0,0xFC,0xFF, 0xFF,0xFF,0xF0
 	    ; data masks for lower part of 5x5 cells
 	    ; for suduko rows 0-8
 	    constant    X_LMask_Table_length = 9
 	    
 ;Shapes_PM   data 0,0,0,0,0, 0,0x40,0x7C,0,0, 0xB8,0xA8,0xA8,0xA8,0xE8, 0x88,0x88,0xA8,0xA8,0xF8, 0xE0,0x20,0x20,0x20,0xF8 ,0xE8,0xA8,0xA8,0xA8,0xB8, 0xF8,0xA8,0xA8,0xA8,0xB8, 0x80,0x80,0x98,0xA0,0xC0, 0xF8,0xA8,0xA8,0xA8,0xF8, 0xE8,0xA8,0xA8,0xA8,0xF8
-Shapes_PM1   data    0,0,0,0,0, 0,0x12,0x1F,0x10,0, 0x1D,0x15,0x15,0x15,0x17, 0x11,0x11,0x15,0x15,0x1F, 0x07,0x04,0x04,0x04,0x1F, 0x17,0x15,0x15,0x15,0x1D, 
+Shapes_PM1   data    0x00,0x00,0x00,0x00,0x00, 0x00,0x12,0x1F,0x10,0x00, 0x1D,0x15,0x15,0x15,0x17, 0x11,0x11,0x15,0x15,0x1F, 0x07,0x04,0x04,0x04,0x1F, 0x17,0x15,0x15,0x15,0x1D
 Shapes_PM2   data    0x1F,0x15,0x15,0x15,0x1D, 0x01,0x01,0x19,0x05,0x03, 0x1F,0x15,0x15,0x15,0x1F, 0x17,0x15,0x15,0x15,0x1F    
    ; 5 bytes of storage for shape paterns for each digit 0-9
 	    constant	Shape_Table1_length = 30
@@ -174,25 +176,84 @@ S2rdlp 	tblrd*+			; one byte from PM to TABLAT, increment TBLPRT
 	
 	
 Write_Cell
-
+	
+	;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Index Look Up Table - For Top Section
 	
 	movf	sudoku_y, w	; Index y-look up table with sudoku_y 
 	lfsr	FSR0, Y_Table	; to find tlp_y
 	movff	PLUSW0, tlp_y
+	
 	movf	sudoku_x, w	; Index x-look up table with sudoku_x 
 	lfsr	FSR0, X_Table	; to find tlp_x
 	movff	PLUSW0, tlp_x
 	lfsr	FSR0, X_UMask_Table	; to find upper mask
 	movff	PLUSW0, mask
 	
-	movf	tlp_x, w
-	call	Set_Cursor_X
-	movf	tlp_y, w
-	call	Set_Cursor_Y	; Move Cursor to Target Cell
-	lfsr	FSR2, read_data
-	movlw	0x05		; Target Cell is of Length 5
-	call	Read_Block	; Read Current State of Target Cell to read_data
+	lfsr	FSR0, X_Table
+	movf	sudoku_x, w	; Index x-look up table with sudoku_x 
+	addlw	.18		; Access Same Row, Third column of look up table
+	movff	PLUSW0, rotate_counter	; Rotate Right Counter 
 	
+	;~~~~~~~~~~~~~~~~~~~~~~~~~Read in and Rotate 5x5 Shape - For Top Section
+	
+	call	Read_in_Shape
+	
+trtlp	movlw	0x05
+	movwf	counter		; Column Counter
+	lfsr	FSR1, shifted_shape
+tsslp	addlw	0x00		; Clear Carry Bit
+	rlcf	POSTINC1, f	; Rotate through carry
+	decfsz	counter
+	bra	tsslp
+	decfsz	rotate_counter	; At least 1 rotation is always requiered
+	bra	trtlp		; Shifted Shape Data now stored at shifted_shape
+	
+	call	Read_and_Replace_GLCD_Chunk
+	
+	;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Index Look Up Table - For Bottom Section
+	
+	movlw	0x05
+	movwf	rotate_counter
+	lfsr	FSR0, X_Table
+	movf	sudoku_x, w	; Index x-look up table with sudoku_x 
+	addlw	.9		; Access Same Row, 2nd column of look up table
+	movff	PLUSW0, WREG	; Rotate Right Counter 
+	subwf	rotate_counter, f   
+	
+	
+	tstfsz	rotate_counter
+	bra	draw_bottom	; Exit if Bottom Section isn't Needed
+	return
+	
+draw_bottom
+	
+	movf	sudoku_x, w	; Index x-look up table with sudoku_x 
+	lfsr	FSR0, X_LMask_Table	; to find lower mask
+	movff	PLUSW0, mask
+	
+	incf	tlp_x, f	; Move to Next Row
+	
+	;~~~~~~~~~~~~~~~~~~~~~~~~~Read in and Rotate 5x5 Shape - For Top Section
+	
+	call	Read_in_Shape
+	
+brtlp	movlw	0x05
+	movwf	counter		; Column Counter
+	lfsr	FSR1, shifted_shape
+bsslp	addlw	0x00		; Clear Carry Bit
+	rrcf	POSTINC1, f	; Rotate through carry
+	decfsz	counter
+	bra	bsslp
+	decfsz	rotate_counter	; At least 1 rotation is always requiered
+	bra	brtlp		; Shifted Shape Data now stored at shifted_shape
+	
+	call	Read_and_Replace_GLCD_Chunk
+	
+	
+	return
+	
+	
+Read_in_Shape
 	movlw	0x05
 	movwf	counter		    ; Shape is 5 long
 	lfsr	FSR1, shifted_shape ; Destination
@@ -205,30 +266,31 @@ idlp	movff	PLUSW0, POSTINC1
 	decfsz	counter
 	bra	idlp		; Shape is read into shifted_shape
 	
-	lfsr	FSR0, X_Table
-	movf	sudoku_x, w	; Index x-look up table with sudoku_x 
-	addlw	0x18		; Access Same Row, Third column of look up table
-	movff	PLUSW0, rotate_counter
-rtlp	movlw	0x05
-	movwf	counter		; Column Counter
-	lfsr	FSR1, shifted_shape
-sslp	addlw	0x00		; Clear Carry Bit
-	rlcf	POSTINC1, f	; Rotate through carry
-	decfsz	counter
-	bra	sslp
-	decfsz	rotate_counter	; At least 1 rotation is always requiered
-	bra	rtlp		; Shifted Shape Data now stored at shifted_shape
+	return
+	
+Read_and_Replace_GLCD_Chunk
+	
+	movf	tlp_x, w
+	call	Set_Cursor_X
+	movf	tlp_y, w
+	call	Set_Cursor_Y	; Move Cursor to Target Cell
+	lfsr	FSR2, read_data
+	movlw	0x05		; Target Cell is of Length 5
+	call	Read_Block	; Read Current State of Target Cell to read_data
 	
 	movlw	0x05
 	movwf	counter
 	lfsr	FSR2, read_data
 	lfsr	FSR1, shifted_shape
+	lfsr	FSR0, read_data
 cmlp	movf	mask, w
-	andwf	FSR2, f		; Apply Mask to Data
+	andwf	POSTINC0, f		; Apply Mask to Data
 	movf	POSTINC1, w
 	addwf	POSTINC2, f	; Add in shape data 
 	decfsz	counter
 	bra	cmlp		; Upper shape data is now at read_data and ready
+	
+	;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Write Data to GLCD - For Top Section	
 	
 	movf	tlp_y, w
 	call	Set_Cursor_Y	; Move Cursor to Target Cell
@@ -236,8 +298,72 @@ cmlp	movf	mask, w
 	movlw	0x05		; Target Cell is of Length 5
 	call	Write_Block	; Read Current State of Target Cell to read_data
 	
-	
 	return
-	
-	
+;	
+;	
+;	movf	sudoku_y, w	; Index y-look up table with sudoku_y 
+;	lfsr	FSR0, Y_Table	; to find tlp_y
+;	movff	PLUSW0, tlp_y
+;	
+;	movf	sudoku_x, w	; Index x-look up table with sudoku_x 
+;	lfsr	FSR0, X_Table	; to find tlp_x
+;	movff	PLUSW0, tlp_x
+;	lfsr	FSR0, X_UMask_Table	; to find upper mask
+;	movff	PLUSW0, mask
+;	
+;	movf	tlp_x, w
+;	call	Set_Cursor_X
+;	movf	tlp_y, w
+;	call	Set_Cursor_Y	; Move Cursor to Target Cell
+;	lfsr	FSR2, read_data
+;	movlw	0x05		; Target Cell is of Length 5
+;	call	Read_Block	; Read Current State of Target Cell to read_data
+;	
+;	movlw	0x05
+;	movwf	counter		    ; Shape is 5 long
+;	lfsr	FSR1, shifted_shape ; Destination
+;	lfsr	FSR0, Shapes_Table  ; Source - up-table
+;	movlw	0x05
+;	mulwf	number_name
+;	movf	PRODL, w	; Create Index for Begining of Relevant Shape
+;idlp	movff	PLUSW0, POSTINC1
+;	addlw	0x01
+;	decfsz	counter
+;	bra	idlp		; Shape is read into shifted_shape
+;	
+;	lfsr	FSR0, X_Table
+;	movf	sudoku_x, w	; Index x-look up table with sudoku_x 
+;	addlw	.18		; Access Same Row, Third column of look up table
+;	movff	PLUSW0, rotate_counter
+;rtlp	movlw	0x05
+;	movwf	counter		; Column Counter
+;	lfsr	FSR1, shifted_shape
+;sslp	addlw	0x00		; Clear Carry Bit
+;	rlcf	POSTINC1, f	; Rotate through carry
+;	decfsz	counter
+;	bra	sslp
+;	decfsz	rotate_counter	; At least 1 rotation is always requiered
+;	bra	rtlp		; Shifted Shape Data now stored at shifted_shape
+;	
+;	movlw	0x05
+;	movwf	counter
+;	lfsr	FSR2, read_data
+;	lfsr	FSR1, shifted_shape
+;	lfsr	FSR0, read_data
+;cmlp	movf	mask, w
+;	andwf	POSTINC0, f		; Apply Mask to Data
+;	movf	POSTINC1, w
+;	addwf	POSTINC2, f	; Add in shape data 
+;	decfsz	counter
+;	bra	cmlp		; Upper shape data is now at read_data and ready
+;	
+;	movf	tlp_y, w
+;	call	Set_Cursor_Y	; Move Cursor to Target Cell
+;	lfsr	FSR2, read_data
+;	movlw	0x05		; Target Cell is of Length 5
+;	call	Write_Block	; Read Current State of Target Cell to read_data
+;	
+;	
+;	
+;	
 	end
