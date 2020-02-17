@@ -2,6 +2,8 @@
 	
 	extern Set_Cursor_X, Set_Cursor_Y
 	extern Send_Data
+	
+	global Draw_Grid
     
 acs0	    udata_acs   ; reserve data space in access ram
 current_row	    res 1
@@ -75,7 +77,7 @@ Draw_Grid
 	movwf	current_row
 	movlw	b'00111111'
 	movwf	vert_lin_pattern
-	movlw	b'00000010'
+	movlw	b'00100000'
 	movwf	horz_lin_pattern
 	call	Draw_Grid_Row
 	
@@ -114,7 +116,8 @@ bilp	movf	horz_lin_pattern, w
 	
 	movlw	0x00	
 	call	Send_Data	; Draw Padding
-	call	Send_Data
+	movlw	0x00	
+	call	Send_Data	; Draw Padding
 	
 	return
 	

@@ -33,17 +33,24 @@ GLCD_Setup
 	clrf	TRISD
 	
 	clrf	PORTD		; Reset PORT B and D 
-	clrf	PORTB
+	clrf	LATB
+;	clrf	PORTB
 
-	bsf	PORTB, GLCD_RST	; Disable Resey
-	bsf	PORTB, GLCD_CS2	; Select Right Side
-	bcf	PORTB, GLCD_CS1	; Deselect Left Side
+	call	Delay
+	
+	bsf	LATB, GLCD_RST	; Disable Reset
+	
+	bsf	LATB, GLCD_CS2	; Right Side
+	bcf	LATB, GLCD_CS1	; Left Side
+	
+	
 	call	Delay
 	
 	movlw	0x3F		; Turn On Instruction
 	call	Send_Instr
 	
 	call	Clear_Board  
+	
 	return
 	
 Clear_Board ; Clear Every Cell on Current Side of Board
