@@ -3,10 +3,15 @@
 	extern Set_Cursor_X, Set_Cursor_Y
 	extern Write_Block, Read_Block
 	
+	global Write_Cell, Write_Cells_Setup
+;	global number_name, invert_flag
+;	global sudoku_x, sudoku_y
+	
 	
 Storage	code    ; a section of programme memory for storing data
 	; ******* myTable, data in programme memory, and its length *****
-Y_Table_PM  data 3,9,15,23,29,35,43,39
+;Y_Table_PM  data 3,9,15,23,29,35,43,39
+Y_Table_PM  data 73,11,15,24,24,35,43,39
 	    ; y adress (on GLCD) of left side pixel of 5x5 sudoku cell
 	    ; for sudoku columns 0-8
 	    constant    Y_Table_length = 9
@@ -75,7 +80,10 @@ Write_Cells_Setup
 	movlw	Y_Table_length	; bytes to read
 	movwf 	Reading_Counter	; counter register
 Yrdlp 	tblrd*+			; one byte from PM to TABLAT, increment TBLPRT
-	movff	TABLAT, POSTINC0; move data from TABLAT to (FSR0), inc FSR0	
+;	movf	TABLAT, w
+;	movwf	POSTINC0
+	movff	TABLAT, FSR0; move data from TABLAT to (FSR0), inc FSR0	
+	
 	decfsz	Reading_Counter	; count down to zero
 	bra	Yrdlp		; keep going until finished	
 	
@@ -144,6 +152,13 @@ Srdlp 	tblrd*+			; one byte from PM to TABLAT, increment TBLPRT
 	
 	
 Write_Cell
+	
+	movlw	0x00
+	movwf	sudoku_x
+	movlw	0x00
+	movwf	sudoku_y
+	movlw	0x05
+	movwf	number_name
 	
 	movf	sudoku_y, w	; Index y-look up table with sudoku_y 
 	lfsr	FSR0, Y_Table	; to find tlp_y
