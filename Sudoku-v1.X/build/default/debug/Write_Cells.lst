@@ -1,4 +1,4 @@
-MPASM 5.81                   WRITE_CELLS.ASM   2-17-2020  12:10:19         PAGE  1
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -20,21 +20,21 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
   0000                00004         extern Write_Block, Read_Block
                       00005         
   0000                00006         global Write_Cell, Write_Cells_Setup
-  0000                00007         global number_name, invert_flag
+  0000                00007         global number_name
   0000                00008         global sudoku_x, sudoku_y
                       00009         
                       00010         
                       00011 Storage code    ; a section of programme memory for storing data
                       00012         ; ******* myTable, data in programme memory, and its length *****
-000000 0003 0009 0015 00013 Y_Table_PM  data 3,9,15,23,29,35,43,39
-       0023 0029 0035 
-       0043 0039 
-                      00014 ;Y_Table_PM  data 73,11,15,24,24,35,43,39
-                      00015             ; y adress (on GLCD) of left side pixel of 5x5 sudoku cell
-                      00016             ; for sudoku columns 0-8
-  0009                00017             constant    Y_Table_length = 9
-                      00018             
-000010 0000 0001 0001 00019 X_Table_PM  data 0,1,1,2,3,4,5,6,6, 5,5,1,1,3,5,5,5,1, 3,1,7,7,5,3,3,1,7
+000000 0003 0009 000F 00013 Y_Table_PM  data .3,.9,.15,.23,.29,.35,.43,.49,.55
+       0017 001D 0023 
+       002B 0031 0037 
+                      00014             ; y adress (on GLCD) of left side pixel of 5x5 sudoku cell
+                      00015             ; for sudoku columns 0-8
+  0009                00016             constant    Y_Table_length = 9
+                      00017             
+                      00018 ;X_Table_PM  data 0,1,1,2,3,4,5,6,6, 5,5,1,1,3,5,5,5,1, 3,1,7,7,5,3,3,1,7
+000012 0000 0001 0001 00019 X_Table_PM  data .0,.1,.1,.2,.3,.4,.5,.6,.6, .5,.5,.1,.1,.3,.5,.5,.5,.1, .3,.1,.7,.7,.5,.3,.3,.1,.7
        0002 0003 0004 
        0005 0006 0006 
        0005 0005 0001 
@@ -49,31 +49,32 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00023             ; for suduko rows 0-8, 0-8, 0-8
   0027                00024             constant    X_Table_length = 27
                       00025             
-000046 00E0 0083 00FE 00026 X_UMask_Table_PM  data 0xE0,0x83,0xFE, 0xFE,0xF8,0xE0, 0xE0,0x83,0xFE
-       00FE 00F8 00E0 
-       00E0 0083 00FE 
-                      00027             ; data masks for upper part of 5x5 cells
-                      00028             ; for suduko rows 0-8
-  0009                00029             constant    X_UMask_Table_length = 9
-                      00030             
-000058 00FF 00FF 000F 00031 X_LMask_Table_PM  data 0xFF,0xFF,0x0F, 0x0F,0x3F,0x00, 0xFF,0xFF,0x0F
-MPASM 5.81                   WRITE_CELLS.ASM   2-17-2020  12:10:19         PAGE  2
+                      00026 ;X_UMask_Table_PM  data 0xE0,0x83,0xFE, 0xFE,0xF8,0xE0, 0xE0,0x83,0xFE
+000048 0007 00C1 007F 00027 X_UMask_Table_PM  data 0x07,0xC1,0x7F, 0x7F,0x1F,0x07, 0x07,0xC1,0x7F
+       007F 001F 0007 
+       0007 00C1 007F 
+                      00028             ; data masks for upper part of 5x5 cells
+                      00029             ; for suduko rows 0-8
+  0009                00030             constant    X_UMask_Table_length = 9
+                      00031             
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE  2
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-       000F 003F 0000 
-       00FF 00FF 000F 
-                      00032             ; data masks for lower part of 5x5 cells
-                      00033             ; for suduko rows 0-8
-  0009                00034             constant    X_LMask_Table_length = 9
-                      00035             
-                      00036 ;Shapes_PM   data 0,0,0,0,0, 0,0x40,0x7C,0,0, 0xB8,0xA8,0xA8,0xA8,0xE8, 0x88,0x88,0xA8,0xA8,0xF8, 0xE0,0
+                      00032 ;X_LMask_Table_PM  data 0xFF,0xFF,0x0F, 0x0F,0x3F,0x00, 0xFF,0xFF,0x0F
+00005A 00FF 00FF 00F0 00033 X_LMask_Table_PM  data 0xFF,0xFF,0xF0, 0xF0,0xFC,0xFF, 0xFF,0xFF,0xF0
+       00F0 00FC 00FF 
+       00FF 00FF 00F0 
+                      00034             ; data masks for lower part of 5x5 cells
+                      00035             ; for suduko rows 0-8
+  0009                00036             constant    X_LMask_Table_length = 9
+                      00037             
+                      00038 ;Shapes_PM   data 0,0,0,0,0, 0,0x40,0x7C,0,0, 0xB8,0xA8,0xA8,0xA8,0xE8, 0x88,0x88,0xA8,0xA8,0xF8, 0xE0,0
                             x20,0x20,0x20,0xF8 ,0xE8,0xA8,0xA8,0xA8,0xB8, 0xF8,0xA8,0xA8,0xA8,0xB8, 0x80,0x80,0x98,0xA0,0xC0
-Warning[210]: Extra ","
-00006A 0000 0000 0000 00037 Shapes_PM1   data    0,0,0,0,0, 0,0x12,0x1F,0x10,0, 0x1D,0x15,0x15,0x15,0x17, 0x11,0x11,0x15,0x15,0x1F, 
-                            0x07,0x04,0x04,0x04,0x1F, 0x17,0x15,0x15,0x15,0x1D, 
+00006C 0000 0000 0000 00039 Shapes_PM1   data    0x00,0x00,0x00,0x00,0x00, 0x00,0x12,0x1F,0x10,0x00, 0x1D,0x15,0x15,0x15,0x17, 0x11,
+                            0x11,0x15,0x15,0x1F, 0x07,0x04,0x04,0x04,0x1F, 0x17,0x15,0x15,0x15,0x1D
        0000 0000 0000 
        0012 001F 0010 
        0000 001D 0015 
@@ -83,7 +84,7 @@ Warning[210]: Extra ","
        0004 0004 0004 
        001F 0017 0015 
        0015 0015 001D 
-0000A6 001F 0015 0015 00038 Shapes_PM2   data    0x1F,0x15,0x15,0x15,0x1D, 0x01,0x01,0x19,0x05,0x03, 0x1F,0x15,0x15,0x15,0x1F, 0x17,
+0000A8 001F 0015 0015 00040 Shapes_PM2   data    0x1F,0x15,0x15,0x15,0x1D, 0x01,0x01,0x19,0x05,0x03, 0x1F,0x15,0x15,0x15,0x1F, 0x17,
                             0x15,0x15,0x15,0x1F    
        0015 001D 0001 
        0001 0019 0005 
@@ -91,236 +92,379 @@ Warning[210]: Extra ","
        0015 0015 001F 
        0017 0015 0015 
        0015 001F 
-                      00039    ; 5 bytes of storage for shape paterns for each digit 0-9
-  0030                00040             constant    Shape_Table1_length = 30
-  0020                00041             constant    Shape_Table2_length = 20
-                      00042    
-                      00043 Tables  udata   0x400    ; reserve data anywhere in RAM (here at 0x400)
-000400                00044 Y_Table         res Y_Table_length    ; reserve 9 bytes for Column Look Up Table
-000409                00045 X_Table         res X_Table_length      ; reserve 27 bytes for Row Look Up Table
-000430                00046 X_UMask_Table   res X_UMask_Table_length ; Mask storage
-000439                00047 X_LMask_Table   res X_LMask_Table_length ; Mask storage
-                      00048 
-                      00049 Tables2 udata   0x600    ; reserve data anywhere in RAM (here at 0x400)
-000600                00050 Shapes_Table    res Shape_Table1_length + Shape_Table2_length
-                      00051         
-                      00052 acs0        udata_acs
-000000                00053 number_name res 1   ; Variables to be accessed from external programs
-000001                00054 sudoku_x    res 1   ; sudoku coordinate of cell
-000002                00055 sudoku_y    res 1   ; sudoku coordinate of cell
-000003                00056 invert_flag res 1   ; invert cell colours?
-                      00057  
-000004                00058 Reading_Counter res 1   
-000005                00059 tlp_x           res 1   ; x-pixel coordinate value of top left of 5x5 cell
-000006                00060 tlp_y           res 1   ; y-pixel coordinate value of top left of 5x5 cell
-000007                00061 mask            res 1
-000008                00062 rotate_counter  res 1
-                      00063         
-MPASM 5.81                   WRITE_CELLS.ASM   2-17-2020  12:10:19         PAGE  3
+                      00041    ; 5 bytes of storage for shape paterns for each digit 0-9
+  0030                00042             constant    Shape_Table1_length = 30
+  0020                00043             constant    Shape_Table2_length = 20
+                      00044    
+                      00045 Tables  udata   0x400    ; reserve data anywhere in RAM (here at 0x400)
+000400                00046 Y_Table         res Y_Table_length    ; reserve 9 bytes for Column Look Up Table
+000409                00047 X_Table         res X_Table_length      ; reserve 27 bytes for Row Look Up Table
+000430                00048 X_UMask_Table   res X_UMask_Table_length ; Mask storage
+000439                00049 X_LMask_Table   res X_LMask_Table_length ; Mask storage
+                      00050 
+                      00051 Tables2 udata   0x500    ; reserve data anywhere in RAM (here at 0x400)
+000500                00052 Shapes_Table    res Shape_Table1_length + Shape_Table2_length
+                      00053         
+                      00054 acs0        udata_acs
+000000                00055 number_name res 1   ; Variables to be accessed from external programs
+000001                00056 sudoku_x    res 1   ; sudoku coordinate of cell
+000002                00057 sudoku_y    res 1   ; sudoku coordinate of cell
+                      00058  
+000003                00059 Reading_Counter res 1   
+000004                00060 tlp_x           res 1   ; x-pixel coordinate value of top left of 5x5 cell
+000005                00061 tlp_y           res 1   ; y-pixel coordinate value of top left of 5x5 cell
+000006                00062 mask            res 1
+000007                00063 rotate_counter  res 1
+                      00064         
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE  3
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-000009                00064 read_data       res 5
-00000E                00065 shifted_shape   res 5
-                      00066         
-000013                00067 counter         res 1
-                      00068         
-                      00069 
-                      00070 Main    code
-                      00071  
-000000                00072 Write_Cells_Setup
-000000 9C7F           00073         bcf     EECON1, CFGS    ;Allow Reading in from PM
-000002 8E7F           00074         bsf     EECON1, EEPGD   
-                      00075         
-                      00076         ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Read In Y Look Up Table From PM to RAM
-                      00077         
-000004 EE?? F0??      00078         lfsr    FSR0, Y_Table   ; Load FSR0 with address in RAM 
-000008 0E??           00079         movlw   upper(Y_Table_PM)       ; address of data in PM
-00000A 6EF8           00080         movwf   TBLPTRU         ; load upper bits to TBLPTRU
-00000C 0E??           00081         movlw   high(Y_Table_PM)        ; address of data in PM
-00000E 6EF7           00082         movwf   TBLPTRH         ; load high byte to TBLPTRH
-000010 0E??           00083         movlw   low(Y_Table_PM) ; address of data in PM
-000012 6EF6           00084         movwf   TBLPTRL         ; load low byte to TBLPTRL
-000014 0E09           00085         movlw   Y_Table_length  ; bytes to read
-000016 6E??           00086         movwf   Reading_Counter ; counter register
-000018 0009           00087 Yrdlp   tblrd*+                 ; one byte from PM to TABLAT, increment TBLPRT
-00001A CFF5 FFEE      00088         movff   TABLAT, POSTINC0; move data from TABLAT to (FSR0), inc FSR0
-00001E 0009           00089         tblrd*+ 
-000020 2E??           00090         decfsz  Reading_Counter ; count down to zero
-000022 D???           00091         bra     Yrdlp           ; keep going until finished     
-                      00092         
-                      00093         ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Read In X Look Up Table From PM to RAM
-                      00094         
-000024 EE?? F0??      00095         lfsr    FSR0, X_Table   ; Load FSR0 with address in RAM 
-000028 0E??           00096         movlw   upper(X_Table_PM)       ; address of data in PM
-00002A 6EF8           00097         movwf   TBLPTRU         ; load upper bits to TBLPTRU
-00002C 0E??           00098         movlw   high(X_Table_PM)        ; address of data in PM
-00002E 6EF7           00099         movwf   TBLPTRH         ; load high byte to TBLPTRH
-000030 0E??           00100         movlw   low(X_Table_PM) ; address of data in PM
-000032 6EF6           00101         movwf   TBLPTRL         ; load low byte to TBLPTRL
-000034 0E27           00102         movlw   X_Table_length  ; bytes to read
-000036 6E??           00103         movwf   Reading_Counter ; our counter register
-000038 0009           00104 Xrdlp   tblrd*+                 ; one byte from PM to TABLAT, increment TBLPRT
-00003A CFF5 FFEE      00105         movff   TABLAT, POSTINC0; move data from TABLAT to (FSR0), inc FSR0
-00003E 0009           00106         tblrd*+ 
-000040 2E??           00107         decfsz  Reading_Counter ; count down to zero
-000042 D???           00108         bra     Xrdlp           ; keep going until finished     
-                      00109         
-                      00110         ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Read in Data Mask Tables From PM to RAM
-                      00111         
-000044 EE?? F0??      00112         lfsr    FSR0, X_UMask_Table     ; Load FSR0 with address in RAM 
-000048 0E??           00113         movlw   upper(X_UMask_Table_PM) ; address of data in PM
-00004A 6EF8           00114         movwf   TBLPTRU         ; load upper bits to TBLPTRU
-00004C 0E??           00115         movlw   high(X_UMask_Table_PM)  ; address of data in PM
-00004E 6EF7           00116         movwf   TBLPTRH         ; load high byte to TBLPTRH
-MPASM 5.81                   WRITE_CELLS.ASM   2-17-2020  12:10:19         PAGE  4
+000008                00065 read_data       res 5
+00000D                00066 shifted_shape   res 5
+                      00067         
+000012                00068 counter         res 1
+                      00069         
+                      00070 
+                      00071 Main    code
+                      00072  
+000000                00073 Write_Cells_Setup
+000000 9C7F           00074         bcf     EECON1, CFGS    ;Allow Reading in from PM
+000002 8E7F           00075         bsf     EECON1, EEPGD   
+                      00076         
+                      00077         ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Read In Y Look Up Table From PM to RAM
+                      00078         
+000004 EE?? F0??      00079         lfsr    FSR0, Y_Table   ; Load FSR0 with address in RAM 
+000008 0E??           00080         movlw   upper(Y_Table_PM)       ; address of data in PM
+00000A 6EF8           00081         movwf   TBLPTRU         ; load upper bits to TBLPTRU
+00000C 0E??           00082         movlw   high(Y_Table_PM)        ; address of data in PM
+00000E 6EF7           00083         movwf   TBLPTRH         ; load high byte to TBLPTRH
+000010 0E??           00084         movlw   low(Y_Table_PM) ; address of data in PM
+000012 6EF6           00085         movwf   TBLPTRL         ; load low byte to TBLPTRL
+000014 0E09           00086         movlw   Y_Table_length  ; bytes to read
+000016 6E??           00087         movwf   Reading_Counter ; counter register
+000018 0009           00088 Yrdlp   tblrd*+                 ; one byte from PM to TABLAT, increment TBLPRT
+00001A CFF5 FFEE      00089         movff   TABLAT, POSTINC0; move data from TABLAT to (FSR0), inc FSR0
+00001E 0009           00090         tblrd*+ 
+000020 2E??           00091         decfsz  Reading_Counter ; count down to zero
+000022 D???           00092         bra     Yrdlp           ; keep going until finished     
+                      00093         
+                      00094         ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Read In X Look Up Table From PM to RAM
+                      00095         
+000024 EE?? F0??      00096         lfsr    FSR0, X_Table   ; Load FSR0 with address in RAM 
+000028 0E??           00097         movlw   upper(X_Table_PM)       ; address of data in PM
+00002A 6EF8           00098         movwf   TBLPTRU         ; load upper bits to TBLPTRU
+00002C 0E??           00099         movlw   high(X_Table_PM)        ; address of data in PM
+00002E 6EF7           00100         movwf   TBLPTRH         ; load high byte to TBLPTRH
+000030 0E??           00101         movlw   low(X_Table_PM) ; address of data in PM
+000032 6EF6           00102         movwf   TBLPTRL         ; load low byte to TBLPTRL
+000034 0E27           00103         movlw   X_Table_length  ; bytes to read
+000036 6E??           00104         movwf   Reading_Counter ; our counter register
+000038 0009           00105 Xrdlp   tblrd*+                 ; one byte from PM to TABLAT, increment TBLPRT
+00003A CFF5 FFEE      00106         movff   TABLAT, POSTINC0; move data from TABLAT to (FSR0), inc FSR0
+00003E 0009           00107         tblrd*+ 
+000040 2E??           00108         decfsz  Reading_Counter ; count down to zero
+000042 D???           00109         bra     Xrdlp           ; keep going until finished     
+                      00110         
+                      00111         ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Read in Data Mask Tables From PM to RAM
+                      00112         
+000044 EE?? F0??      00113         lfsr    FSR0, X_UMask_Table     ; Load FSR0 with address in RAM 
+000048 0E??           00114         movlw   upper(X_UMask_Table_PM) ; address of data in PM
+00004A 6EF8           00115         movwf   TBLPTRU         ; load upper bits to TBLPTRU
+00004C 0E??           00116         movlw   high(X_UMask_Table_PM)  ; address of data in PM
+00004E 6EF7           00117         movwf   TBLPTRH         ; load high byte to TBLPTRH
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE  4
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-000050 0E??           00117         movlw   low(X_UMask_Table_PM)   ; address of data in PM
-000052 6EF6           00118         movwf   TBLPTRL         ; load low byte to TBLPTRL
-000054 0E09           00119         movlw   X_UMask_Table_length    ; bytes to read
-000056 6E??           00120         movwf   Reading_Counter ; our counter register
-000058 0009           00121 UMrdlp  tblrd*+                 ; one byte from PM to TABLAT, increment TBLPRT
-00005A CFF5 FFEE      00122         movff   TABLAT, POSTINC0; move data from TABLAT to (FSR0), inc FSR0
-00005E 0009           00123         tblrd*+ 
-000060 2E??           00124         decfsz  Reading_Counter ; count down to zero
-000062 D???           00125         bra     UMrdlp          ; keep going until finished     
-                      00126         
-000064 EE?? F0??      00127         lfsr    FSR0, X_LMask_Table     ; Load FSR0 with address in RAM 
-000068 0E??           00128         movlw   upper(X_LMask_Table_PM) ; address of data in PM
-00006A 6EF8           00129         movwf   TBLPTRU         ; load upper bits to TBLPTRU
-00006C 0E??           00130         movlw   high(X_LMask_Table_PM)  ; address of data in PM
-00006E 6EF7           00131         movwf   TBLPTRH         ; load high byte to TBLPTRH
-000070 0E??           00132         movlw   low(X_LMask_Table_PM)   ; address of data in PM
-000072 6EF6           00133         movwf   TBLPTRL         ; load low byte to TBLPTRL
-000074 0E09           00134         movlw   X_LMask_Table_length    ; bytes to read
-000076 6E??           00135         movwf   Reading_Counter ; our counter register
-000078 0009           00136 LMrdlp  tblrd*+                 ; one byte from PM to TABLAT, increment TBLPRT
-00007A CFF5 FFEE      00137         movff   TABLAT, POSTINC0; move data from TABLAT to (FSR0), inc FSR0     
-00007E 0009           00138         tblrd*+ 
-000080 2E??           00139         decfsz  Reading_Counter ; count down to zero
-000082 D???           00140         bra     LMrdlp          ; keep going until finished     
-                      00141 
-                      00142         ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Read In Shape Look Up Table From PM to RAM
-                      00143         
-000084 EE?? F0??      00144         lfsr    FSR0, Shapes_Table      ; Load FSR0 with address in RAM 
-000088 0E??           00145         movlw   upper(Shapes_PM1)       ; address of data in PM
-00008A 6EF8           00146         movwf   TBLPTRU         ; load upper bits to TBLPTRU
-00008C 0E??           00147         movlw   high(Shapes_PM1)        ; address of data in PM
-00008E 6EF7           00148         movwf   TBLPTRH         ; load high byte to TBLPTRH
-000090 0E??           00149         movlw   low(Shapes_PM1) ; address of data in PM
-000092 6EF6           00150         movwf   TBLPTRL         ; load low byte to TBLPTRL
-000094 0E30           00151         movlw   Shape_Table1_length     ; bytes to read
-000096 6E??           00152         movwf   Reading_Counter ; our counter register
-000098 0009           00153 S1rdlp  tblrd*+                 ; one byte from PM to TABLAT, increment TBLPRT
-00009A CFF5 FFEE      00154         movff   TABLAT, POSTINC0; move data from TABLAT to (FSR0), inc FSR0     
-00009E 0009           00155         tblrd*+ 
-0000A0 2E??           00156         decfsz  Reading_Counter ; count down to zero
-0000A2 D???           00157         bra     S1rdlp          ; keep going until finished
-                      00158         
-0000A4 0E??           00159         movlw   upper(Shapes_PM2)       ; address of data in PM
-0000A6 6EF8           00160         movwf   TBLPTRU         ; load upper bits to TBLPTRU
-0000A8 0E??           00161         movlw   high(Shapes_PM2)        ; address of data in PM
-0000AA 6EF7           00162         movwf   TBLPTRH         ; load high byte to TBLPTRH
-0000AC 0E??           00163         movlw   low(Shapes_PM2) ; address of data in PM
-0000AE 6EF6           00164         movwf   TBLPTRL         ; load low byte to TBLPTRL
-0000B0 0E20           00165         movlw   Shape_Table2_length     ; bytes to read
-0000B2 6E??           00166         movwf   Reading_Counter ; our counter register
-0000B4 0009           00167 S2rdlp  tblrd*+                 ; one byte from PM to TABLAT, increment TBLPRT
-0000B6 CFF5 FFEE      00168         movff   TABLAT, POSTINC0; move data from TABLAT to (FSR0), inc FSR0     
-0000BA 0009           00169         tblrd*+ 
-MPASM 5.81                   WRITE_CELLS.ASM   2-17-2020  12:10:19         PAGE  5
+000050 0E??           00118         movlw   low(X_UMask_Table_PM)   ; address of data in PM
+000052 6EF6           00119         movwf   TBLPTRL         ; load low byte to TBLPTRL
+000054 0E09           00120         movlw   X_UMask_Table_length    ; bytes to read
+000056 6E??           00121         movwf   Reading_Counter ; our counter register
+000058 0009           00122 UMrdlp  tblrd*+                 ; one byte from PM to TABLAT, increment TBLPRT
+00005A CFF5 FFEE      00123         movff   TABLAT, POSTINC0; move data from TABLAT to (FSR0), inc FSR0
+00005E 0009           00124         tblrd*+ 
+000060 2E??           00125         decfsz  Reading_Counter ; count down to zero
+000062 D???           00126         bra     UMrdlp          ; keep going until finished     
+                      00127         
+000064 EE?? F0??      00128         lfsr    FSR0, X_LMask_Table     ; Load FSR0 with address in RAM 
+000068 0E??           00129         movlw   upper(X_LMask_Table_PM) ; address of data in PM
+00006A 6EF8           00130         movwf   TBLPTRU         ; load upper bits to TBLPTRU
+00006C 0E??           00131         movlw   high(X_LMask_Table_PM)  ; address of data in PM
+00006E 6EF7           00132         movwf   TBLPTRH         ; load high byte to TBLPTRH
+000070 0E??           00133         movlw   low(X_LMask_Table_PM)   ; address of data in PM
+000072 6EF6           00134         movwf   TBLPTRL         ; load low byte to TBLPTRL
+000074 0E09           00135         movlw   X_LMask_Table_length    ; bytes to read
+000076 6E??           00136         movwf   Reading_Counter ; our counter register
+000078 0009           00137 LMrdlp  tblrd*+                 ; one byte from PM to TABLAT, increment TBLPRT
+00007A CFF5 FFEE      00138         movff   TABLAT, POSTINC0; move data from TABLAT to (FSR0), inc FSR0     
+00007E 0009           00139         tblrd*+ 
+000080 2E??           00140         decfsz  Reading_Counter ; count down to zero
+000082 D???           00141         bra     LMrdlp          ; keep going until finished     
+                      00142 
+                      00143         ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Read In Shape Look Up Table From PM to RAM
+                      00144         
+000084 EE?? F0??      00145         lfsr    FSR0, Shapes_Table      ; Load FSR0 with address in RAM 
+000088 0E??           00146         movlw   upper(Shapes_PM1)       ; address of data in PM
+00008A 6EF8           00147         movwf   TBLPTRU         ; load upper bits to TBLPTRU
+00008C 0E??           00148         movlw   high(Shapes_PM1)        ; address of data in PM
+00008E 6EF7           00149         movwf   TBLPTRH         ; load high byte to TBLPTRH
+000090 0E??           00150         movlw   low(Shapes_PM1) ; address of data in PM
+000092 6EF6           00151         movwf   TBLPTRL         ; load low byte to TBLPTRL
+000094 0E30           00152         movlw   Shape_Table1_length     ; bytes to read
+000096 6E??           00153         movwf   Reading_Counter ; our counter register
+000098 0009           00154 S1rdlp  tblrd*+                 ; one byte from PM to TABLAT, increment TBLPRT
+00009A CFF5 FFEE      00155         movff   TABLAT, POSTINC0; move data from TABLAT to (FSR0), inc FSR0     
+00009E 0009           00156         tblrd*+ 
+0000A0 2E??           00157         decfsz  Reading_Counter ; count down to zero
+0000A2 D???           00158         bra     S1rdlp          ; keep going until finished
+                      00159         
+0000A4 0E??           00160         movlw   upper(Shapes_PM2)       ; address of data in PM
+0000A6 6EF8           00161         movwf   TBLPTRU         ; load upper bits to TBLPTRU
+0000A8 0E??           00162         movlw   high(Shapes_PM2)        ; address of data in PM
+0000AA 6EF7           00163         movwf   TBLPTRH         ; load high byte to TBLPTRH
+0000AC 0E??           00164         movlw   low(Shapes_PM2) ; address of data in PM
+0000AE 6EF6           00165         movwf   TBLPTRL         ; load low byte to TBLPTRL
+0000B0 0E20           00166         movlw   Shape_Table2_length     ; bytes to read
+0000B2 6E??           00167         movwf   Reading_Counter ; our counter register
+0000B4 0009           00168 S2rdlp  tblrd*+                 ; one byte from PM to TABLAT, increment TBLPRT
+0000B6 CFF5 FFEE      00169         movff   TABLAT, POSTINC0; move data from TABLAT to (FSR0), inc FSR0     
+0000BA 0009           00170         tblrd*+ 
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE  5
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-0000BC 2E??           00170         decfsz  Reading_Counter ; count down to zero
-0000BE D???           00171         bra     S2rdlp          ; keep going until finished     
-                      00172         
-0000C0 0012           00173         return
-                      00174         
+0000BC 2E??           00171         decfsz  Reading_Counter ; count down to zero
+0000BE D???           00172         bra     S2rdlp          ; keep going until finished     
+                      00173         
+0000C0 0012           00174         return
                       00175         
-0000C2                00176 Write_Cell
-                      00177 
+                      00176         
+0000C2                00177 Write_Cell
                       00178         
-0000C2 50??           00179         movf    sudoku_y, w     ; Index y-look up table with sudoku_y 
-0000C4 EE?? F0??      00180         lfsr    FSR0, Y_Table   ; to find tlp_y
-0000C8 CFEB F???      00181         movff   PLUSW0, tlp_y
-0000CC 50??           00182         movf    sudoku_x, w     ; Index x-look up table with sudoku_x 
-0000CE EE?? F0??      00183         lfsr    FSR0, X_Table   ; to find tlp_x
-0000D2 CFEB F???      00184         movff   PLUSW0, tlp_x
-0000D6 EE?? F0??      00185         lfsr    FSR0, X_UMask_Table     ; to find upper mask
-0000DA CFEB F???      00186         movff   PLUSW0, mask
-                      00187         
-0000DE 50??           00188         movf    tlp_x, w
-0000E0 EC?? F???      00189         call    Set_Cursor_X
-0000E4 50??           00190         movf    tlp_y, w
-0000E6 EC?? F???      00191         call    Set_Cursor_Y    ; Move Cursor to Target Cell
-0000EA EE?? F0??      00192         lfsr    FSR2, read_data
-0000EE 0E05           00193         movlw   0x05            ; Target Cell is of Length 5
-0000F0 EC?? F???      00194         call    Read_Block      ; Read Current State of Target Cell to read_data
+                      00179         ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Index Look Up Table - For Top Section
+                      00180         
+0000C2 50??           00181         movf    sudoku_y, w     ; Index y-look up table with sudoku_y 
+0000C4 EE?? F0??      00182         lfsr    FSR0, Y_Table   ; to find tlp_y
+0000C8 CFEB F???      00183         movff   PLUSW0, tlp_y
+                      00184         
+0000CC 50??           00185         movf    sudoku_x, w     ; Index x-look up table with sudoku_x 
+0000CE EE?? F0??      00186         lfsr    FSR0, X_Table   ; to find tlp_x
+0000D2 CFEB F???      00187         movff   PLUSW0, tlp_x
+0000D6 EE?? F0??      00188         lfsr    FSR0, X_UMask_Table     ; to find upper mask
+0000DA CFEB F???      00189         movff   PLUSW0, mask
+                      00190         
+0000DE EE?? F0??      00191         lfsr    FSR0, X_Table
+0000E2 50??           00192         movf    sudoku_x, w     ; Index x-look up table with sudoku_x 
+0000E4 0F12           00193         addlw   .18             ; Access Same Row, Third column of look up table
+0000E6 CFEB F???      00194         movff   PLUSW0, rotate_counter  ; Rotate Right Counter 
                       00195         
-0000F4 0E05           00196         movlw   0x05
-0000F6 6E??           00197         movwf   counter             ; Shape is 5 long
-0000F8 EE?? F0??      00198         lfsr    FSR1, shifted_shape ; Destination
-0000FC EE?? F0??      00199         lfsr    FSR0, Shapes_Table  ; Source - up-table
-000100 0E05           00200         movlw   0x05
-000102 02??           00201         mulwf   number_name
-000104 50F3           00202         movf    PRODL, w        ; Create Index for Begining of Relevant Shape
-000106 CFEB FFE6      00203 idlp    movff   PLUSW0, POSTINC1
-00010A 0F01           00204         addlw   0x01
-00010C 2E??           00205         decfsz  counter
-00010E D???           00206         bra     idlp            ; Shape is read into shifted_shape
-                      00207         
-000110 EE?? F0??      00208         lfsr    FSR0, X_Table
-000114 50??           00209         movf    sudoku_x, w     ; Index x-look up table with sudoku_x 
-000116 0F18           00210         addlw   0x18            ; Access Same Row, Third column of look up table
-000118 CFEB F???      00211         movff   PLUSW0, rotate_counter
-00011C 0E05           00212 rtlp    movlw   0x05
-00011E 6E??           00213         movwf   counter         ; Column Counter
-000120 EE?? F0??      00214         lfsr    FSR1, shifted_shape
-000124 0F00           00215 sslp    addlw   0x00            ; Clear Carry Bit
-000126 36E6           00216         rlcf    POSTINC1, f     ; Rotate through carry
-000128 2E??           00217         decfsz  counter
-00012A D???           00218         bra     sslp
-00012C 2E??           00219         decfsz  rotate_counter  ; At least 1 rotation is always requiered
-00012E D???           00220         bra     rtlp            ; Shifted Shape Data now stored at shifted_shape
+                      00196         ;~~~~~~~~~~~~~~~~~~~~~~~~~Read in and Rotate 5x5 Shape - For Top Section
+                      00197         
+0000EA EC?? F???      00198         call    Read_in_Shape
+                      00199         
+0000EE 0E05           00200 trtlp   movlw   0x05
+0000F0 6E??           00201         movwf   counter         ; Column Counter
+0000F2 EE?? F0??      00202         lfsr    FSR1, shifted_shape
+0000F6 0F00           00203 tsslp   addlw   0x00            ; Clear Carry Bit
+0000F8 36E6           00204         rlcf    POSTINC1, f     ; Rotate through carry
+0000FA 2E??           00205         decfsz  counter
+0000FC D???           00206         bra     tsslp
+0000FE 2E??           00207         decfsz  rotate_counter  ; At least 1 rotation is always requiered
+000100 D???           00208         bra     trtlp           ; Shifted Shape Data now stored at shifted_shape
+                      00209         
+000102 EC?? F???      00210         call    Read_and_Replace_GLCD_Chunk
+                      00211         
+                      00212         ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Index Look Up Table - For Bottom Section
+                      00213         
+                      00214 ;       movlw   0x05
+                      00215 ;       movwf   rotate_counter
+                      00216 ;       lfsr    FSR0, X_Table
+                      00217 ;       movf    sudoku_x, w     ; Index x-look up table with sudoku_x 
+                      00218 ;       addlw   .9              ; Access Same Rowa, 2nd column of look up table
+                      00219 ;       movff   PLUSW0, WREG    ; Rotate Right Counter 
+                      00220 ;       subwf   rotate_counter, f   
                       00221         
-000130 0E05           00222         movlw   0x05
-MPASM 5.81                   WRITE_CELLS.ASM   2-17-2020  12:10:19         PAGE  6
+                      00222 ;       movlw   0x05
+                      00223 ;       movwf   rotate_counter
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE  6
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-000132 6E??           00223         movwf   counter
-000134 EE?? F0??      00224         lfsr    FSR2, read_data
-000138 EE?? F0??      00225         lfsr    FSR1, shifted_shape
-00013C 50??           00226 cmlp    movf    mask, w
-00013E 1602           00227         andwf   FSR2, f         ; Apply Mask to Data
-000140 50E6           00228         movf    POSTINC1, w
-000142 26DE           00229         addwf   POSTINC2, f     ; Add in shape data 
-000144 2E??           00230         decfsz  counter
-000146 D???           00231         bra     cmlp            ; Upper shape data is now at read_data and ready
-                      00232         
-000148 50??           00233         movf    tlp_y, w
-00014A EC?? F???      00234         call    Set_Cursor_Y    ; Move Cursor to Target Cell
-00014E EE?? F0??      00235         lfsr    FSR2, read_data
-000152 0E05           00236         movlw   0x05            ; Target Cell is of Length 5
-000154 EC?? F???      00237         call    Write_Block     ; Read Current State of Target Cell to read_data
-                      00238         
-                      00239         
-000158 0012           00240         return
-                      00241         
+000106 EE?? F0??      00224         lfsr    FSR0, X_Table
+00010A 50??           00225         movf    sudoku_x, w     ; Index x-look up table with sudoku_x 
+00010C 0F09           00226         addlw   .9              ; Access Same Rowa, 2nd column of look up table
+00010E CFEB F???      00227         movff   PLUSW0, rotate_counter  ; Rotate Right Counter 
+                      00228 ;       subwf   rotate_counter, f 
+                      00229         
+000112 0E05           00230         movlw   0x05
+000114 62??           00231         cpfseq  rotate_counter
+000116 D???           00232         bra     draw_bottom     ; Exit if Bottom Section isn't Needed
+000118 0012           00233         return
+                      00234         
+00011A                00235 draw_bottom
+                      00236         
+00011A 50??           00237         movf    sudoku_x, w     ; Index x-look up table with sudoku_x 
+00011C EE?? F0??      00238         lfsr    FSR0, X_LMask_Table     ; to find lower mask
+000120 CFEB F???      00239         movff   PLUSW0, mask
+                      00240         
+000124 2A??           00241         incf    tlp_x, f        ; Move to Next Row
                       00242         
-                      00243         end
-MPASM 5.81                   WRITE_CELLS.ASM   2-17-2020  12:10:19         PAGE  7
+                      00243         ;~~~~~~~~~~~~~~~~~~~~~~~~~Read in and Rotate 5x5 Shape - For Top Section
+                      00244         
+000126 EC?? F???      00245         call    Read_in_Shape
+                      00246         
+00012A 0E05           00247 brtlp   movlw   0x05
+00012C 6E??           00248         movwf   counter         ; Column Counter
+00012E EE?? F0??      00249         lfsr    FSR1, shifted_shape
+000132 0F00           00250 bsslp   addlw   0x00            ; Clear Carry Bit
+000134 32E6           00251         rrcf    POSTINC1, f     ; Rotate through carry
+000136 2E??           00252         decfsz  counter
+000138 D???           00253         bra     bsslp
+00013A 2E??           00254         decfsz  rotate_counter  ; At least 1 rotation is always requiered
+00013C D???           00255         bra     brtlp           ; Shifted Shape Data now stored at shifted_shape
+                      00256         
+00013E EC?? F???      00257         call    Read_and_Replace_GLCD_Chunk
+                      00258         
+                      00259         
+000142 0012           00260         return
+                      00261         
+                      00262         
+000144                00263 Read_in_Shape
+000144 0E05           00264         movlw   0x05
+000146 6E??           00265         movwf   counter             ; Shape is 5 long
+000148 EE?? F0??      00266         lfsr    FSR1, shifted_shape ; Destination
+00014C EE?? F0??      00267         lfsr    FSR0, Shapes_Table  ; Source - up-table
+000150 0E05           00268         movlw   0x05
+000152 02??           00269         mulwf   number_name
+000154 50F3           00270         movf    PRODL, w        ; Create Index for Begining of Relevant Shape
+000156 CFEB FFE6      00271 idlp    movff   PLUSW0, POSTINC1
+00015A 0F01           00272         addlw   0x01
+00015C 2E??           00273         decfsz  counter
+00015E D???           00274         bra     idlp            ; Shape is read into shifted_shape
+                      00275         
+000160 0012           00276         return
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE  7
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00277         
+000162                00278 Read_and_Replace_GLCD_Chunk
+                      00279         
+000162 50??           00280         movf    tlp_x, w
+000164 EC?? F???      00281         call    Set_Cursor_X
+000168 50??           00282         movf    tlp_y, w
+00016A EC?? F???      00283         call    Set_Cursor_Y    ; Move Cursor to Target Cell
+00016E EE?? F0??      00284         lfsr    FSR2, read_data
+000172 0E05           00285         movlw   0x05            ; Target Cell is of Length 5
+000174 EC?? F???      00286         call    Read_Block      ; Read Current State of Target Cell to read_data
+                      00287         
+000178 0E05           00288         movlw   0x05
+00017A 6E??           00289         movwf   counter
+00017C EE?? F0??      00290         lfsr    FSR2, read_data
+000180 EE?? F0??      00291         lfsr    FSR1, shifted_shape
+000184 EE?? F0??      00292         lfsr    FSR0, read_data
+000188 50??           00293 cmlp    movf    mask, w
+00018A 16EE           00294         andwf   POSTINC0, f             ; Apply Mask to Data
+00018C 50E6           00295         movf    POSTINC1, w
+00018E 26DE           00296         addwf   POSTINC2, f     ; Add in shape data 
+000190 2E??           00297         decfsz  counter
+000192 D???           00298         bra     cmlp            ; Upper shape data is now at read_data and ready
+                      00299         
+                      00300         ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Write Data to GLCD - For Top Section        
+                      00301         
+000194 50??           00302         movf    tlp_y, w
+000196 EC?? F???      00303         call    Set_Cursor_Y    ; Move Cursor to Target Cell
+00019A EE?? F0??      00304         lfsr    FSR2, read_data
+00019E 0E05           00305         movlw   0x05            ; Target Cell is of Length 5
+0001A0 EC?? F???      00306         call    Write_Block     ; Read Current State of Target Cell to read_data
+                      00307         
+0001A4 0012           00308         return
+                      00309 ;       
+                      00310 ;       
+                      00311 ;       movf    sudoku_y, w     ; Index y-look up table with sudoku_y 
+                      00312 ;       lfsr    FSR0, Y_Table   ; to find tlp_y
+                      00313 ;       movff   PLUSW0, tlp_y
+                      00314 ;       
+                      00315 ;       movf    sudoku_x, w     ; Index x-look up table with sudoku_x 
+                      00316 ;       lfsr    FSR0, X_Table   ; to find tlp_x
+                      00317 ;       movff   PLUSW0, tlp_x
+                      00318 ;       lfsr    FSR0, X_UMask_Table     ; to find upper mask
+                      00319 ;       movff   PLUSW0, mask
+                      00320 ;       
+                      00321 ;       movf    tlp_x, w
+                      00322 ;       call    Set_Cursor_X
+                      00323 ;       movf    tlp_y, w
+                      00324 ;       call    Set_Cursor_Y    ; Move Cursor to Target Cell
+                      00325 ;       lfsr    FSR2, read_data
+                      00326 ;       movlw   0x05            ; Target Cell is of Length 5
+                      00327 ;       call    Read_Block      ; Read Current State of Target Cell to read_data
+                      00328 ;       
+                      00329 ;       movlw   0x05
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE  8
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00330 ;       movwf   counter             ; Shape is 5 long
+                      00331 ;       lfsr    FSR1, shifted_shape ; Destination
+                      00332 ;       lfsr    FSR0, Shapes_Table  ; Source - up-table
+                      00333 ;       movlw   0x05
+                      00334 ;       mulwf   number_name
+                      00335 ;       movf    PRODL, w        ; Create Index for Begining of Relevant Shape
+                      00336 ;idlp   movff   PLUSW0, POSTINC1
+                      00337 ;       addlw   0x01
+                      00338 ;       decfsz  counter
+                      00339 ;       bra     idlp            ; Shape is read into shifted_shape
+                      00340 ;       
+                      00341 ;       lfsr    FSR0, X_Table
+                      00342 ;       movf    sudoku_x, w     ; Index x-look up table with sudoku_x 
+                      00343 ;       addlw   .18             ; Access Same Row, Third column of look up table
+                      00344 ;       movff   PLUSW0, rotate_counter
+                      00345 ;rtlp   movlw   0x05
+                      00346 ;       movwf   counter         ; Column Counter
+                      00347 ;       lfsr    FSR1, shifted_shape
+                      00348 ;sslp   addlw   0x00            ; Clear Carry Bit
+                      00349 ;       rlcf    POSTINC1, f     ; Rotate through carry
+                      00350 ;       decfsz  counter
+                      00351 ;       bra     sslp
+                      00352 ;       decfsz  rotate_counter  ; At least 1 rotation is always requiered
+                      00353 ;       bra     rtlp            ; Shifted Shape Data now stored at shifted_shape
+                      00354 ;       
+                      00355 ;       movlw   0x05
+                      00356 ;       movwf   counter
+                      00357 ;       lfsr    FSR2, read_data
+                      00358 ;       lfsr    FSR1, shifted_shape
+                      00359 ;       lfsr    FSR0, read_data
+                      00360 ;cmlp   movf    mask, w
+                      00361 ;       andwf   POSTINC0, f             ; Apply Mask to Data
+                      00362 ;       movf    POSTINC1, w
+                      00363 ;       addwf   POSTINC2, f     ; Add in shape data 
+                      00364 ;       decfsz  counter
+                      00365 ;       bra     cmlp            ; Upper shape data is now at read_data and ready
+                      00366 ;       
+                      00367 ;       movf    tlp_y, w
+                      00368 ;       call    Set_Cursor_Y    ; Move Cursor to Target Cell
+                      00369 ;       lfsr    FSR2, read_data
+                      00370 ;       movlw   0x05            ; Target Cell is of Length 5
+                      00371 ;       call    Write_Block     ; Read Current State of Target Cell to read_data
+                      00372 ;       
+                      00373 ;       
+                      00374 ;       
+                      00375 ;       
+                      00376         end
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE  9
 
 
 SYMBOL TABLE
@@ -379,7 +523,7 @@ ADMSK5                            00000005
 ADON                              00000000
 ADRES                             00000FC3
 ADRESH                            00000FC4
-MPASM 5.81                   WRITE_CELLS.ASM   2-17-2020  12:10:19         PAGE  8
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE 10
 
 
 SYMBOL TABLE
@@ -438,7 +582,7 @@ ANSEL16                           00000000
 ANSEL17                           00000001
 ANSEL18                           00000002
 ANSEL19                           00000003
-MPASM 5.81                   WRITE_CELLS.ASM   2-17-2020  12:10:19         PAGE  9
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE 11
 
 
 SYMBOL TABLE
@@ -497,7 +641,7 @@ C1TSEL0                           00000000
 C1TSEL1                           00000001
 C1TSEL2                           00000002
 C2INA                             00000004
-MPASM 5.81                   WRITE_CELLS.ASM   2-17-2020  12:10:19         PAGE 10
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE 12
 
 
 SYMBOL TABLE
@@ -556,7 +700,7 @@ CCP1IP                            00000001
 CCP1M0                            00000000
 CCP1M1                            00000001
 CCP1M2                            00000002
-MPASM 5.81                   WRITE_CELLS.ASM   2-17-2020  12:10:19         PAGE 11
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE 13
 
 
 SYMBOL TABLE
@@ -615,7 +759,7 @@ CCP5M0                            00000000
 CCP5M1                            00000001
 CCP5M2                            00000002
 CCP5M3                            00000003
-MPASM 5.81                   WRITE_CELLS.ASM   2-17-2020  12:10:19         PAGE 12
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE 14
 
 
 SYMBOL TABLE
@@ -674,7 +818,7 @@ CCP9IP                            00000006
 CCP9M0                            00000000
 CCP9M1                            00000001
 CCP9M2                            00000002
-MPASM 5.81                   WRITE_CELLS.ASM   2-17-2020  12:10:19         PAGE 13
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE 15
 
 
 SYMBOL TABLE
@@ -733,7 +877,7 @@ CHSN1                             00000001
 CHSN2                             00000002
 CK1                               00000006
 CK2                               00000001
-MPASM 5.81                   WRITE_CELLS.ASM   2-17-2020  12:10:19         PAGE 14
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE 16
 
 
 SYMBOL TABLE
@@ -792,7 +936,7 @@ CTMUIE                            00000003
 CTMUIF                            00000003
 CTMUIP                            00000003
 CTMUMD                            00000006
-MPASM 5.81                   WRITE_CELLS.ASM   2-17-2020  12:10:19         PAGE 15
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE 17
 
 
 SYMBOL TABLE
@@ -851,7 +995,7 @@ ECCP1AS1                          00000005
 ECCP1AS2                          00000006
 ECCP1ASE                          00000007
 ECCP1CON                          00000FBB
-MPASM 5.81                   WRITE_CELLS.ASM   2-17-2020  12:10:19         PAGE 16
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE 18
 
 
 SYMBOL TABLE
@@ -910,7 +1054,7 @@ FSR2H                             00000FDA
 FSR2L                             00000FD9
 GCEN                              00000007
 GIE                               00000007
-MPASM 5.81                   WRITE_CELLS.ASM   2-17-2020  12:10:19         PAGE 17
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE 19
 
 
 SYMBOL TABLE
@@ -969,7 +1113,7 @@ INT3F                             00000002
 INT3IE                            00000005
 INT3IF                            00000002
 INT3IP                            00000001
-MPASM 5.81                   WRITE_CELLS.ASM   2-17-2020  12:10:19         PAGE 18
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE 20
 
 
 SYMBOL TABLE
@@ -1028,7 +1172,7 @@ LATB7                             00000007
 LATC                              00000F8B
 LATC0                             00000000
 LATC1                             00000001
-MPASM 5.81                   WRITE_CELLS.ASM   2-17-2020  12:10:19         PAGE 19
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE 21
 
 
 SYMBOL TABLE
@@ -1087,7 +1231,7 @@ LATJ1                             00000001
 LATJ2                             00000002
 LATJ3                             00000003
 LATJ4                             00000004
-MPASM 5.81                   WRITE_CELLS.ASM   2-17-2020  12:10:19         PAGE 20
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE 22
 
 
 SYMBOL TABLE
@@ -1146,7 +1290,7 @@ ODCON3                            00000F27
 OE                                00000001
 OERR                              00000001
 OERR1                             00000001
-MPASM 5.81                   WRITE_CELLS.ASM   2-17-2020  12:10:19         PAGE 21
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE 23
 
 
 SYMBOL TABLE
@@ -1205,7 +1349,7 @@ P3M0                              00000006
 P3M1                              00000007
 P3RSEN                            00000007
 PA3                               00000000
-MPASM 5.81                   WRITE_CELLS.ASM   2-17-2020  12:10:19         PAGE 22
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE 24
 
 
 SYMBOL TABLE
@@ -1264,7 +1408,7 @@ POSTDEC1                          00000FE5
 POSTDEC2                          00000FDD
 POSTINC0                          00000FEE
 POSTINC1                          00000FE6
-MPASM 5.81                   WRITE_CELLS.ASM   2-17-2020  12:10:19         PAGE 23
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE 25
 
 
 SYMBOL TABLE
@@ -1323,7 +1467,7 @@ RA3                               00000003
 RA4                               00000004
 RA5                               00000005
 RA6                               00000006
-MPASM 5.81                   WRITE_CELLS.ASM   2-17-2020  12:10:19         PAGE 24
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE 26
 
 
 SYMBOL TABLE
@@ -1382,7 +1526,7 @@ RD5                               00000005
 RD6                               00000006
 RD7                               00000007
 RDPU                              00000007
-MPASM 5.81                   WRITE_CELLS.ASM   2-17-2020  12:10:19         PAGE 25
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE 27
 
 
 SYMBOL TABLE
@@ -1441,7 +1585,7 @@ ROSEL                             00000004
 ROSSLP                            00000005
 RSEN                              00000001
 RTCC                              00000004
-MPASM 5.81                   WRITE_CELLS.ASM   2-17-2020  12:10:19         PAGE 26
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE 28
 
 
 SYMBOL TABLE
@@ -1476,7 +1620,9 @@ RXDTP                             00000005
 R_NOT_W                           00000002
 R_W                               00000002
 Read_Block                        00000000
-Reading_Counter                   00000004
+Read_and_Replace_GLCD_Chunk       00000162
+Read_in_Shape                     00000144
+Reading_Counter                   00000003
 S                                 00000003
 S1rdlp                            00000098
 S2rdlp                            000000B4
@@ -1498,14 +1644,14 @@ SEN                               00000000
 SENDB                             00000003
 SENDB1                            00000003
 SENDB2                            00000003
-SMP                               00000007
-SOSCEN                            00000003
-MPASM 5.81                   WRITE_CELLS.ASM   2-17-2020  12:10:19         PAGE 27
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE 29
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
+SMP                               00000007
+SOSCEN                            00000003
 SOSCGO                            00000003
 SOSCI                             00000001
 SOSCO                             00000000
@@ -1557,14 +1703,14 @@ SSPCON2                           00000FC5
 SSPEN                             00000005
 SSPIE                             00000003
 SSPIF                             00000003
-SSPIP                             00000003
-SSPM0                             00000000
-MPASM 5.81                   WRITE_CELLS.ASM   2-17-2020  12:10:19         PAGE 28
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE 30
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
+SSPIP                             00000003
+SSPM0                             00000000
 SSPM1                             00000001
 SSPM2                             00000002
 SSPM3                             00000003
@@ -1589,9 +1735,9 @@ Set_Cursor_X                      00000000
 Set_Cursor_Y                      00000000
 Shape_Table1_length               00000030
 Shape_Table2_length               00000020
-Shapes_PM1                        0000006A
-Shapes_PM2                        000000A6
-Shapes_Table                      00000600
+Shapes_PM1                        0000006C
+Shapes_PM2                        000000A8
+Shapes_Table                      00000500
 T08BIT                            00000006
 T0CKI                             00000004
 T0CON                             00000FD5
@@ -1616,14 +1762,14 @@ T12CON                            00000F30
 T12OUTPS0                         00000003
 T12OUTPS1                         00000004
 T12OUTPS2                         00000005
-T12OUTPS3                         00000006
-T1CKI                             00000005
-MPASM 5.81                   WRITE_CELLS.ASM   2-17-2020  12:10:19         PAGE 29
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE 31
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
+T12OUTPS3                         00000006
+T1CKI                             00000005
 T1CKPS0                           00000004
 T1CKPS1                           00000005
 T1CON                             00000FCD
@@ -1675,14 +1821,14 @@ T5GGO                             00000003
 T5GGO_NOT_T5DONE                  00000003
 T5GPOL                            00000006
 T5GSPM                            00000004
-T5GSS0                            00000000
-T5GSS1                            00000001
-MPASM 5.81                   WRITE_CELLS.ASM   2-17-2020  12:10:19         PAGE 30
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE 32
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
+T5GSS0                            00000000
+T5GSS1                            00000001
 T5GTM                             00000005
 T5GVAL                            00000002
 T6CKPS0                           00000000
@@ -1734,14 +1880,14 @@ TMR10IP                           00000005
 TMR10MD                           00000007
 TMR10ON                           00000002
 TMR12                             00000F32
-TMR12IE                           00000006
-TMR12IF                           00000006
-MPASM 5.81                   WRITE_CELLS.ASM   2-17-2020  12:10:19         PAGE 31
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE 33
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
+TMR12IE                           00000006
+TMR12IF                           00000006
 TMR12IP                           00000006
 TMR12MD                           00000000
 TMR12ON                           00000002
@@ -1793,14 +1939,14 @@ TMR5GIF                           00000007
 TMR5GIP                           00000007
 TMR5H                             00000F7D
 TMR5IE                            00000001
-TMR5IF                            00000001
-TMR5IP                            00000001
-MPASM 5.81                   WRITE_CELLS.ASM   2-17-2020  12:10:19         PAGE 32
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE 34
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
+TMR5IF                            00000001
+TMR5IP                            00000001
 TMR5L                             00000F7C
 TMR5MD                            00000003
 TMR5ON                            00000000
@@ -1852,14 +1998,14 @@ TRISB1                            00000001
 TRISB2                            00000002
 TRISB3                            00000003
 TRISB4                            00000004
-TRISB5                            00000005
-TRISB6                            00000006
-MPASM 5.81                   WRITE_CELLS.ASM   2-17-2020  12:10:19         PAGE 33
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE 35
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
+TRISB5                            00000005
+TRISB6                            00000006
 TRISB7                            00000007
 TRISC                             00000F94
 TRISC0                            00000000
@@ -1911,14 +2057,14 @@ TRISH4                            00000004
 TRISH5                            00000005
 TRISH6                            00000006
 TRISH7                            00000007
-TRISJ                             00000F9A
-TRISJ0                            00000000
-MPASM 5.81                   WRITE_CELLS.ASM   2-17-2020  12:10:19         PAGE 34
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE 36
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
+TRISJ                             00000F9A
+TRISJ0                            00000000
 TRISJ1                            00000001
 TRISJ2                            00000002
 TRISJ3                            00000003
@@ -1970,14 +2116,14 @@ UA                                00000001
 UART1MD                           00000003
 UART2MD                           00000004
 UB                                00000007
-ULPEN                             00000002
-ULPLVL                            00000005
-MPASM 5.81                   WRITE_CELLS.ASM   2-17-2020  12:10:19         PAGE 35
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE 37
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
+ULPEN                             00000002
+ULPLVL                            00000005
 ULPSINK                           00000001
 ULPWU                             00000000
 UMrdlp                            00000058
@@ -2005,13 +2151,13 @@ Write_Block                       00000000
 Write_Cell                        000000C2
 Write_Cells_Setup                 00000000
 X_LMask_Table                     00000439
-X_LMask_Table_PM                  00000058
+X_LMask_Table_PM                  0000005A
 X_LMask_Table_length              00000009
 X_Table                           00000409
-X_Table_PM                        00000010
+X_Table_PM                        00000012
 X_Table_length                    00000027
 X_UMask_Table                     00000430
-X_UMask_Table_PM                  00000046
+X_UMask_Table_PM                  00000048
 X_UMask_Table_length              00000009
 Xrdlp                             00000038
 Y_Table                           00000400
@@ -2029,14 +2175,14 @@ _BOREN_NOSLP_2L                   000000FD
 _BOREN_OFF_2L                     000000F9
 _BOREN_ON_2L                      000000FB
 _BOREN_SBORDIS_2L                 000000FF
-_BORPWR_HIGH_2L                   000000DF
-_BORPWR_LOW_2L                    0000009F
-MPASM 5.81                   WRITE_CELLS.ASM   2-17-2020  12:10:19         PAGE 36
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE 38
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
+_BORPWR_HIGH_2L                   000000DF
+_BORPWR_LOW_2L                    0000009F
 _BORPWR_MEDIUM_2L                 000000BF
 _BORPWR_ZPBORMV_2L                000000FF
 _BORV_0_2L                        000000E7
@@ -2088,14 +2234,14 @@ _EASHFT_OFF_3L                    000000F7
 _EASHFT_ON_3L                     000000FF
 _EBRT0_OFF_7L                     000000FF
 _EBRT0_ON_7L                      000000FE
-_EBRT1_OFF_7L                     000000FF
-_EBRT1_ON_7L                      000000FD
-MPASM 5.81                   WRITE_CELLS.ASM   2-17-2020  12:10:19         PAGE 37
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE 39
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
+_EBRT1_OFF_7L                     000000FF
+_EBRT1_ON_7L                      000000FD
 _EBRT2_OFF_7L                     000000FF
 _EBRT2_ON_7L                      000000FB
 _EBRT3_OFF_7L                     000000FF
@@ -2147,14 +2293,14 @@ _MSSPMSK_MSK7_3H                  000000FF
 _PLLCFG_OFF_1H                    000000EF
 _PLLCFG_ON_1H                     000000FF
 _PWRTEN_OFF_2L                    000000FF
-_PWRTEN_ON_2L                     000000FE
-_RETEN_OFF_1L                     000000FE
-MPASM 5.81                   WRITE_CELLS.ASM   2-17-2020  12:10:19         PAGE 38
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE 40
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
+_PWRTEN_ON_2L                     000000FE
+_RETEN_OFF_1L                     000000FE
 _RETEN_ON_1L                      000000FF
 _RTCOSC_INTOSCREF_3L              000000FE
 _RTCOSC_SOSCREF_3L                000000FF
@@ -2206,14 +2352,14 @@ _WRT6_OFF_6L                      000000FF
 _WRT6_ON_6L                       000000BF
 _WRT7_OFF_6L                      000000FF
 _WRT7_ON_6L                       0000007F
-_WRTB_OFF_6H                      000000FF
-_WRTB_ON_6H                       000000BF
-MPASM 5.81                   WRITE_CELLS.ASM   2-17-2020  12:10:19         PAGE 39
+MPASM 5.81                   WRITE_CELLS.ASM   2-18-2020  15:21:07         PAGE 41
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
+_WRTB_OFF_6H                      000000FF
+_WRTB_ON_6H                       000000BF
 _WRTC_OFF_6H                      000000FF
 _WRTC_ON_6H                       000000DF
 _WRTD_OFF_6H                      000000FF
@@ -2223,24 +2369,26 @@ _XINST_ON_1L                      000000FF
 __18F87K22                        00000001
 __DEBUG                           
 __MPLAB_DEBUGGER_ICD3             1
-cmlp                              0000013C
-counter                           00000013
-idlp                              00000106
-invert_flag                       00000003
-mask                              00000007
+brtlp                             0000012A
+bsslp                             00000132
+cmlp                              00000188
+counter                           00000012
+draw_bottom                       0000011A
+idlp                              00000156
+mask                              00000006
 number_name                       00000000
-read_data                         00000009
-rotate_counter                    00000008
-rtlp                              0000011C
-shifted_shape                     0000000E
-sslp                              00000124
+read_data                         00000008
+rotate_counter                    00000007
+shifted_shape                     0000000D
 sudoku_x                          00000001
 sudoku_y                          00000002
-tlp_x                             00000005
-tlp_y                             00000006
+tlp_x                             00000004
+tlp_y                             00000005
+trtlp                             000000EE
+tsslp                             000000F6
 
 Errors   :     0
-Warnings :     1 reported,     0 suppressed
+Warnings :     0 reported,     0 suppressed
 Messages :     0 reported,     0 suppressed
 
 

@@ -8,9 +8,12 @@
     
 acs0	    udata_acs   ; reserve data space in access ram
 delay_count     res 1	; reserve one byte for counter in the delay 
+delay_count1     res 1	
+delay_count2     res 1	
 test_col_count	res 1
 test_row_count	res 1
 block_count	res 1
+shift_count	res 1
 	
 	    	; GLCD Control Pins - PORTB
 	constant    GLCD_CS1 = 0 ; Notted - select left side
@@ -28,13 +31,12 @@ block_count	res 1
 glcd	code
  
 GLCD_Setup
-			
+	
 	clrf	TRISB		; Set PORT B and D Out
 	clrf	TRISD
 	
 	clrf	PORTD		; Reset PORT B and D 
 	clrf	LATB
-;	clrf	PORTB
 
 	call	Delay
 	
@@ -98,8 +100,16 @@ Read_Block ; Read block of length W of data from GLCD to FSR2
 	
 	movwf	block_count	; Set Number of Columns to Read
 	
-rblp	call	E_Pulse		; Enable Pulse
+	call	E_Pulse		; Enter reading mode
+	
+rblp	bsf	LATB, GLCD_E   	; Enable Pin High
+	call	Delay
+	
 	movff	PORTD, POSTINC2 ; Move Data Value to FSR2
+	
+	bcf	LATB, GLCD_E    ; Enable Pin Low
+	call	Delay
+	
 	decfsz	block_count
 	bra	rblp
 	
@@ -210,10 +220,29 @@ E_Pulse
 	return
 	
 Delay	
-	movlw	0xFF		;   32us Delay
+	movlw	b'00010000'	;   3.4 us Delay
 	movwf	delay_count
-dllp	decfsz	delay_count
-	bra	dllp
+dllp1	decfsz	delay_count
+	bra	dllp1
+;;	
+;	
+;;	movlw	0xFF	;   32us Delay
+;	movff	PORTJ, delay_count
+;dllp1	decfsz	delay_count
+;	bra	dllp1
+;;	
+;	movlw	0xFF	
+;	movwf	delay_count1
+;dllp1	
+;	movlw	0xFF	
+;	movwf	delay_count2
+;	
+;dllp2	decfsz	delay_count2
+;	bra	dllp2
+;	
+;	decfsz	delay_count1
+;	bra	dllp1
+
 	return
 	
 	end

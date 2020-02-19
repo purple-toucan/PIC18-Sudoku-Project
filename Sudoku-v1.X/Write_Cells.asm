@@ -4,7 +4,7 @@
 	extern Write_Block, Read_Block
 	
 	global Write_Cell, Write_Cells_Setup
-	global number_name, invert_flag
+	global number_name
 	global sudoku_x, sudoku_y
 	
 	
@@ -48,14 +48,13 @@ X_Table		res X_Table_length	; reserve 27 bytes for Row Look Up Table
 X_UMask_Table	res X_UMask_Table_length ; Mask storage
 X_LMask_Table	res X_LMask_Table_length ; Mask storage
 
-Tables2	udata	0x600    ; reserve data anywhere in RAM (here at 0x400)
+Tables2	udata	0x500    ; reserve data anywhere in RAM (here at 0x400)
 Shapes_Table	res Shape_Table1_length + Shape_Table2_length
 	
 acs0	    udata_acs
 number_name res 1   ; Variables to be accessed from external programs
 sudoku_x    res 1   ; sudoku coordinate of cell
 sudoku_y    res 1   ; sudoku coordinate of cell
-invert_flag res 1   ; invert cell colours?
  
 Reading_Counter	res 1	
 tlp_x		res 1	; x-pixel coordinate value of top left of 5x5 cell
@@ -212,16 +211,14 @@ tsslp	addlw	0x00		; Clear Carry Bit
 	
 	;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Index Look Up Table - For Bottom Section
 	
-	movlw	0x05
-	movwf	rotate_counter
+
 	lfsr	FSR0, X_Table
 	movf	sudoku_x, w	; Index x-look up table with sudoku_x 
-	addlw	.9		; Access Same Row, 2nd column of look up table
-	movff	PLUSW0, WREG	; Rotate Right Counter 
-	subwf	rotate_counter, f   
+	addlw	.9		; Access Same Rowa, 2nd column of look up table
+	movff	PLUSW0, rotate_counter	; Rotate Right Counter 
 	
-	
-	tstfsz	rotate_counter
+	movlw	0x05
+	cpfseq	rotate_counter
 	bra	draw_bottom	; Exit if Bottom Section isn't Needed
 	return
 	
@@ -299,71 +296,5 @@ cmlp	movf	mask, w
 	call	Write_Block	; Read Current State of Target Cell to read_data
 	
 	return
-;	
-;	
-;	movf	sudoku_y, w	; Index y-look up table with sudoku_y 
-;	lfsr	FSR0, Y_Table	; to find tlp_y
-;	movff	PLUSW0, tlp_y
-;	
-;	movf	sudoku_x, w	; Index x-look up table with sudoku_x 
-;	lfsr	FSR0, X_Table	; to find tlp_x
-;	movff	PLUSW0, tlp_x
-;	lfsr	FSR0, X_UMask_Table	; to find upper mask
-;	movff	PLUSW0, mask
-;	
-;	movf	tlp_x, w
-;	call	Set_Cursor_X
-;	movf	tlp_y, w
-;	call	Set_Cursor_Y	; Move Cursor to Target Cell
-;	lfsr	FSR2, read_data
-;	movlw	0x05		; Target Cell is of Length 5
-;	call	Read_Block	; Read Current State of Target Cell to read_data
-;	
-;	movlw	0x05
-;	movwf	counter		    ; Shape is 5 long
-;	lfsr	FSR1, shifted_shape ; Destination
-;	lfsr	FSR0, Shapes_Table  ; Source - up-table
-;	movlw	0x05
-;	mulwf	number_name
-;	movf	PRODL, w	; Create Index for Begining of Relevant Shape
-;idlp	movff	PLUSW0, POSTINC1
-;	addlw	0x01
-;	decfsz	counter
-;	bra	idlp		; Shape is read into shifted_shape
-;	
-;	lfsr	FSR0, X_Table
-;	movf	sudoku_x, w	; Index x-look up table with sudoku_x 
-;	addlw	.18		; Access Same Row, Third column of look up table
-;	movff	PLUSW0, rotate_counter
-;rtlp	movlw	0x05
-;	movwf	counter		; Column Counter
-;	lfsr	FSR1, shifted_shape
-;sslp	addlw	0x00		; Clear Carry Bit
-;	rlcf	POSTINC1, f	; Rotate through carry
-;	decfsz	counter
-;	bra	sslp
-;	decfsz	rotate_counter	; At least 1 rotation is always requiered
-;	bra	rtlp		; Shifted Shape Data now stored at shifted_shape
-;	
-;	movlw	0x05
-;	movwf	counter
-;	lfsr	FSR2, read_data
-;	lfsr	FSR1, shifted_shape
-;	lfsr	FSR0, read_data
-;cmlp	movf	mask, w
-;	andwf	POSTINC0, f		; Apply Mask to Data
-;	movf	POSTINC1, w
-;	addwf	POSTINC2, f	; Add in shape data 
-;	decfsz	counter
-;	bra	cmlp		; Upper shape data is now at read_data and ready
-;	
-;	movf	tlp_y, w
-;	call	Set_Cursor_Y	; Move Cursor to Target Cell
-;	lfsr	FSR2, read_data
-;	movlw	0x05		; Target Cell is of Length 5
-;	call	Write_Block	; Read Current State of Target Cell to read_data
-;	
-;	
-;	
-;	
+
 	end

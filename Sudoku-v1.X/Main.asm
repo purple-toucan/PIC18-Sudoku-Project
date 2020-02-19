@@ -5,8 +5,9 @@
 	extern	Draw_Grid
 	
 	extern Write_Cell, Write_Cells_Setup
-	extern number_name, invert_flag
+	extern number_name
 	extern sudoku_x, sudoku_y
+	
 	
 rst	code	0    ; reset vector
 	goto	setup
@@ -22,16 +23,29 @@ setup
 	; ******* Main programme ****************************************
 start 	
 	
-	movlw	0x00
-	movwf	sudoku_x
-	movlw	0x01
-	movwf	sudoku_y
-	movlw	0x04
-	movwf	number_name
-	call	Write_Cell
+	clrf	sudoku_x
 	
-
+rlp	
+	movff	sudoku_x, number_name
+	incf	number_name, f
+	clrf	sudoku_y
 	
+clp	call	Write_Cell
+	incf	sudoku_y, f
+	
+	movlw	0x09
+	cpfslt	number_name
+	clrf	number_name
+	incf	number_name, f
+	
+	movlw	0x09
+	cpfseq	sudoku_y
+	bra	clp
+	
+	incf	sudoku_x, f
+	movlw	0x09
+	cpfseq	sudoku_x
+	bra	rlp
 	
 	goto	$		; goto current line in code
   
