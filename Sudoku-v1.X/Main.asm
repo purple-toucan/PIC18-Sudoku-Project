@@ -1,30 +1,31 @@
 	#include p18f87k22.inc
 
-	extern	GLCD_Setup
-	extern	Draw_Grid
-	
-	extern Write_Cell, Write_Cells_Setup
-	extern number_name
-	extern sudoku_x, sudoku_y
-	
+	extern GLCD_Setup	
+	extern Write_Cursor, Write_Cells_Setup
+	extern Give_Input, PadSetup
+	extern validate
+	extern update_game, logic_setup
 	extern write_correct, write_wrong
+	extern Create_Board
 	
 acs0	    udata_acs   ; reserve data space in access ram
 game_loop_counter res 1	    
 w_store    res 1	
 
-    constant	loops_per_semi_flash = 15
+    constant	loops_per_semi_flash = 0x7F
     
 rst	code	0    ; reset vector
+
 	goto	setup
 
 main	code
 	; ******* Programme FLASH read Setup Code ***********************
 setup	
+	call	PadSetup
 	call	GLCD_Setup
-	call	Draw_Grid
+	call	logic_setup
 	call	Write_Cells_Setup
-
+	call	Create_Board
 	goto	start
 	
 	; ******* Main programme ****************************************
@@ -49,7 +50,7 @@ received_input
 	
 validation
 	
-	call	validate_board	    ; check solution
+	call	validate	    ; check solution
 	movwf	w_store
 	
 	movlw	0x00
@@ -65,6 +66,7 @@ validation
 	bra	game_loop_end
 	
 continue
+	movf	w_store, w
 	call	update_game	    ; input edits cursor position or cell value
 	bra	game_loop_end
 	
@@ -87,6 +89,7 @@ not_N
 	movlw	0x0
 	movwf	game_loop_counter	; reset counter
 	call	Write_Cursor		; write cursor's true value
+	bra	game_loop_start
 	
 correct_board_exit
 	
