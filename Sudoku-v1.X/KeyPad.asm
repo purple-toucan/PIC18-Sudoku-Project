@@ -4,9 +4,10 @@
 	
 
 PMCodeTable code
-;keypad_codes db 0xFF,0xBE,0x77,0xB7,0xD7,0x7B,0xBB,0xDB,0x7D,0xBD,0xDD,0x7E,0xDE,0xEE,0xED,0xEB,0xE7, ' ','0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'
 keypad_codes db 0x77,0xB7,0xD7,0x7B,0xBB,0xDB,0x7D,0xBD,0xDD, 0xE7,0xDE,0xED,0x7E, 0xEE, 0xAA
+; keypad characters 1,2,3,4,5,6,7,8,9, F(up),B(right),D(down),A(left), C, O&E
 desired_outputs db .1,.2,.3,.4,.5,.6,.7,.8,.9, 0x41,0x42,0x43,0x44, 0x00, 0xFE
+; outputs           1,2,3,4,5,6,7,8,9, up,right,down,left, Clear, exit
 	constant keypad_bytes = .15
 	constant output_bytes = .15
 			
@@ -28,7 +29,6 @@ Delay
 	movwf	delay_count
 dllp1	decfsz	delay_count
 	bra	dllp1
-	
 	return
 	
 PadSetup
@@ -39,7 +39,6 @@ PadSetup
 					; E pull ups on
 	clrf	LATE			; clear LATE
 	
-	clrf	TRISC
 	    
 	clrf	previous_input		; clear previous input
 	
@@ -88,7 +87,6 @@ Give_Input
 	movf	PORTE, W	    ; Read columns
 	addwf	Temprd, F	    ; Combine with row data to give keypad code
 	
-	movff	Temprd,	PORTC
 	movlw	0xFF
 	cpfseq	Temprd
 	bra	pass_nothing	    
@@ -128,47 +126,6 @@ pass_compare
 	
 no_action
 	retlw	0xFF		    ; return with statement of no input on W
-	
-	
-;ReadPad
-;	movlw	0x0F		    ; Drive columns low
-;	movwf	TRISE
-;	call	Delay		    ; Wait
-;	movf	PORTE, W	    ; Read Rows
-;	movwf	Temprd		    ; Overwrite tmeporary storage
-;	
-;	movlw	0xF0		    ; Drive rows low
-;	movwf	TRISE		
-;	call	Delay		    ; Wait
-;	movf	PORTE, W	    ; Read columns
-;	addwf	Temprd, F	    ; Combine with row data
-;	
-;	movff	Temprd, PORTH
-;	
-;	movlw	0x00		    ; Setting counter to zero
-;	movwf	counter
-;	
-;	lfsr	FSR0, PadCodes
-;	
-;libloop	movlw	0x10		    
-;	cpfsgt	counter		    ; If counter is > than 16, no code matches
-;	bra	Lib1
-;	movlw	0xFF		    ; Error code and exit
-;	return
-;	
-;Lib1	movf	POSTINC0, W	    ; Load keypad input code to w
-;	cpfseq	Temprd		    ; Compair to input
-;	bra	Lib2
-;	movlw	0x10		    ; Offset by 17 to find ACSII
-;	movf	PLUSW0, W	    ; Load ASCII to W
-;	return
-;	
-;Lib2	incf	counter		    ; Current position not a match
-;	bra	libloop
-;	
-;	return
-	
-
 	
     end
 

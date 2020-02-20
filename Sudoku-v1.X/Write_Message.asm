@@ -1,12 +1,12 @@
     #include p18f87k22.inc
+    
+	global write_correct, write_wrong
 
 	extern Set_GLCD_Cursor_X, Set_GLCD_Cursor_Y
 	extern Write_Block_2
 	
-	global write_correct, write_wrong
 	
-Storage	code    ; a section of programme memory for storing data
-	; ******* myTable, data in programme memory, and its length *****
+Storage	code    
 C_PM data 0x38,0x44,0x44,0x28
 	constant    C_length = 4
 O_PM data 0x38,0x44,0x44,0x38

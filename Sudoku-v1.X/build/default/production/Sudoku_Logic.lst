@@ -1,4 +1,4 @@
-MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  16:51:29         PAGE  1
+MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  18:15:22         PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -15,14 +15,14 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00008 ;==========================================================================
                       00009 
                       02986         LIST
-                      00002 
-  0000                00003         extern Write_Cursor
-                      00004                 
-  0000                00005         global  cursor_x, cursor_y
-  0000                00006         global  sudoku_brdplayer, sudoku_brdsolution
-  0000                00007         global  sudoku_brdfixedp
-  0000                00008         global  update_game
-  0000                00009         global  logic_setup
+                      00002                 
+  0000                00003         global  cursor_x, cursor_y
+  0000                00004         global  sudoku_brdplayer, sudoku_brdsolution
+  0000                00005         global  sudoku_brdfixedp
+  0000                00006         global  update_game
+  0000                00007         global  logic_setup
+                      00008         
+  0000                00009         extern Write_Cursor
                       00010         
                       00011         
                       00012 reserve code
@@ -57,7 +57,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 00000A 6E??           00041     movwf   RIGHT
                       00042     
 00000C 0E44           00043     movlw   0x44
-MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  16:51:29         PAGE  2
+MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  18:15:22         PAGE  2
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -88,93 +88,89 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 00002A D???           00066     bra     go_down
 00002C                00067 Right
 00002C 62??           00068     cpfseq  RIGHT
-00002E D???           00069     bra     Left
+00002E D???           00069     bra     go_left
 000030 D???           00070     bra     go_right
-000032                00071 Left
-000032 62??           00072     cpfseq  LEFT
-000034 0000           00073     nop
-000036 D???           00074     bra     go_left
-                      00075     
-000038                00076 end_return
-000038 0012           00077     return
-                      00078 
-00003A                00079 go_up
-00003A 0E00           00080     movlw   0x00
-00003C 62??           00081     cpfseq  cursor_x ;  check if cursor is at boundary
-00003E D???           00082     bra     go_up_con
-000040 D???           00083     bra     end_return
-000042                00084 go_up_con
-000042 EC?? F???      00085     call    Write_Cursor
-000046 06??           00086     decf    cursor_x, f ; move cursor
-000048 D???           00087     bra     end_return
-                      00088     
-00004A                00089 go_down
-00004A 0E08           00090     movlw   0x08
-00004C 62??           00091     cpfseq  cursor_x ;  check if cursor is at boundary
-00004E D???           00092     bra     go_down_con
-000050 D???           00093     bra     end_return
-000052                00094 go_down_con
-000052 EC?? F???      00095     call    Write_Cursor
-000056 2A??           00096     incf    cursor_x, f
-MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  16:51:29         PAGE  3
+                      00071     
+000032                00072 end_return
+000032 0012           00073     return
+                      00074 
+000034                00075 go_up
+000034 0E00           00076     movlw   0x00
+000036 62??           00077     cpfseq  cursor_x ;  check if cursor is at boundary
+000038 D???           00078     bra     go_up_con
+00003A D???           00079     bra     end_return
+00003C                00080 go_up_con
+00003C EC?? F???      00081     call    Write_Cursor
+000040 06??           00082     decf    cursor_x, f ; move cursor
+000042 D???           00083     bra     end_return
+                      00084     
+000044                00085 go_down
+000044 0E08           00086     movlw   0x08
+000046 62??           00087     cpfseq  cursor_x ;  check if cursor is at boundary
+000048 D???           00088     bra     go_down_con
+00004A D???           00089     bra     end_return
+00004C                00090 go_down_con
+00004C EC?? F???      00091     call    Write_Cursor
+000050 2A??           00092     incf    cursor_x, f
+000052 D???           00093     bra     end_return
+                      00094     
+000054                00095 go_right
+000054 0E08           00096     movlw   0x08
+MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  18:15:22         PAGE  3
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-000058 D???           00097     bra     end_return
-                      00098     
-00005A                00099 go_right
-00005A 0E08           00100     movlw   0x08
-00005C 62??           00101     cpfseq  cursor_y ;  check if cursor is at boundary
-00005E D???           00102     bra     go_right_con
-000060 D???           00103     bra     end_return
-000062                00104 go_right_con
-000062 EC?? F???      00105     call    Write_Cursor
-000066 2A??           00106     incf    cursor_y, f
-000068 D???           00107     bra     end_return
-                      00108 
-00006A                00109 go_left
-00006A 0E00           00110     movlw   0x00
-00006C 62??           00111     cpfseq  cursor_y ;  check if cursor is at boundary
-00006E D???           00112     bra     go_left_con
-000070 D???           00113     bra     end_return
-000072                00114 go_left_con
-000072 EC?? F???      00115     call    Write_Cursor
-000076 06??           00116     decf    cursor_y, f
-                      00117     
-000078 D???           00118     bra     end_return
-                      00119     
-00007A                00120 curs_fix    ;   determining if cursor is fixed or not
-00007A EE?? F0??      00121     lfsr    0, sudoku_brdfixedp ;   loading fixed position sudoku onto FSR0
-                      00122     
-00007E 0E09           00123     movlw   0x09
-000080 02??           00124     mulwf   cursor_x    ;   multiply x pos by 9
-                      00125     
-000082 50??           00126     movf    cursor_y, w
-000084 24F3           00127     addwf   PRODL, w    ;   offset is now loaded into wreg    
-                      00128     
-000086 50EB           00129     movf    PLUSW0, w
-000088 6E??           00130     movwf   FIXED    ;  load TEST location with w
-00008A 66??           00131     tstfsz  FIXED    ;  skips if location of cursor in fixed board is 0
-00008C 0012           00132     return
-00008E EE?? F0??      00133     lfsr    0, sudoku_brdplayer ;   loading player board onto FSR0
-                      00134     
-000092 0E09           00135     movlw   0x09
-000094 02??           00136     mulwf   cursor_x
-                      00137     
-000096 50??           00138     movf    cursor_y, w
-000098 24F3           00139     addwf   PRODL, w    ;   offset is now loaded into wreg    
+000056 62??           00097     cpfseq  cursor_y ;  check if cursor is at boundary
+000058 D???           00098     bra     go_right_con
+00005A D???           00099     bra     end_return
+00005C                00100 go_right_con
+00005C EC?? F???      00101     call    Write_Cursor
+000060 2A??           00102     incf    cursor_y, f
+000062 D???           00103     bra     end_return
+                      00104 
+000064                00105 go_left
+000064 0E00           00106     movlw   0x00
+000066 62??           00107     cpfseq  cursor_y ;  check if cursor is at boundary
+000068 D???           00108     bra     go_left_con
+00006A D???           00109     bra     end_return
+00006C                00110 go_left_con
+00006C EC?? F???      00111     call    Write_Cursor
+000070 06??           00112     decf    cursor_y, f
+                      00113     
+000072 D???           00114     bra     end_return
+                      00115     
+000074                00116 curs_fix    ;   determining if cursor is fixed or not
+000074 EE?? F0??      00117     lfsr    0, sudoku_brdfixedp ;   loading fixed position sudoku onto FSR0
+                      00118     
+000078 0E09           00119     movlw   0x09
+00007A 02??           00120     mulwf   cursor_x    ;   multiply x pos by 9
+                      00121     
+00007C 50??           00122     movf    cursor_y, w
+00007E 24F3           00123     addwf   PRODL, w    ;   offset is now loaded into wreg    
+                      00124     
+000080 50EB           00125     movf    PLUSW0, w
+000082 6E??           00126     movwf   FIXED    ;  load TEST location with w
+000084 66??           00127     tstfsz  FIXED    ;  skips if location of cursor in fixed board is 0
+000086 0012           00128     return
+000088 EE?? F0??      00129     lfsr    0, sudoku_brdplayer ;   loading player board onto FSR0
+                      00130     
+00008C 0E09           00131     movlw   0x09
+00008E 02??           00132     mulwf   cursor_x
+                      00133     
+000090 50??           00134     movf    cursor_y, w
+000092 24F3           00135     addwf   PRODL, w    ;   offset is now loaded into wreg    
+                      00136     
+000094 C??? FFEB      00137     movff   W_in, PLUSW0    ;   changing value of cursor cell on player board
+                      00138     
+000098 EC?? F???      00139     call    Write_Cursor        ; calling to realise cursor action
                       00140     
-00009A C??? FFEB      00141     movff   W_in, PLUSW0    ;   changing value of cursor cell on player board
-                      00142     
-00009E EC?? F???      00143     call    Write_Cursor        ; calling to realise cursor action
-                      00144     
-                      00145     
-0000A2 0012           00146     return  
-                      00147 
-                      00148     end
-MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  16:51:29         PAGE  4
+                      00141     
+00009C 0012           00142     return  
+                      00143 
+                      00144     end
+MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  18:15:22         PAGE  4
 
 
 SYMBOL TABLE
@@ -233,7 +229,7 @@ ADMSK5                            00000005
 ADON                              00000000
 ADRES                             00000FC3
 ADRESH                            00000FC4
-MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  16:51:29         PAGE  5
+MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  18:15:22         PAGE  5
 
 
 SYMBOL TABLE
@@ -292,7 +288,7 @@ ANSEL16                           00000000
 ANSEL17                           00000001
 ANSEL18                           00000002
 ANSEL19                           00000003
-MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  16:51:29         PAGE  6
+MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  18:15:22         PAGE  6
 
 
 SYMBOL TABLE
@@ -351,7 +347,7 @@ C1TSEL0                           00000000
 C1TSEL1                           00000001
 C1TSEL2                           00000002
 C2INA                             00000004
-MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  16:51:29         PAGE  7
+MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  18:15:22         PAGE  7
 
 
 SYMBOL TABLE
@@ -410,7 +406,7 @@ CCP1IP                            00000001
 CCP1M0                            00000000
 CCP1M1                            00000001
 CCP1M2                            00000002
-MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  16:51:29         PAGE  8
+MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  18:15:22         PAGE  8
 
 
 SYMBOL TABLE
@@ -469,7 +465,7 @@ CCP5M0                            00000000
 CCP5M1                            00000001
 CCP5M2                            00000002
 CCP5M3                            00000003
-MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  16:51:29         PAGE  9
+MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  18:15:22         PAGE  9
 
 
 SYMBOL TABLE
@@ -528,7 +524,7 @@ CCP9IP                            00000006
 CCP9M0                            00000000
 CCP9M1                            00000001
 CCP9M2                            00000002
-MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  16:51:29         PAGE 10
+MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  18:15:22         PAGE 10
 
 
 SYMBOL TABLE
@@ -587,7 +583,7 @@ CHSN1                             00000001
 CHSN2                             00000002
 CK1                               00000006
 CK2                               00000001
-MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  16:51:29         PAGE 11
+MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  18:15:22         PAGE 11
 
 
 SYMBOL TABLE
@@ -646,7 +642,7 @@ CTMUIE                            00000003
 CTMUIF                            00000003
 CTMUIP                            00000003
 CTMUMD                            00000006
-MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  16:51:29         PAGE 12
+MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  18:15:22         PAGE 12
 
 
 SYMBOL TABLE
@@ -705,7 +701,7 @@ ECCP1AS                           00000FBF
 ECCP1AS0                          00000004
 ECCP1AS1                          00000005
 ECCP1AS2                          00000006
-MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  16:51:29         PAGE 13
+MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  18:15:22         PAGE 13
 
 
 SYMBOL TABLE
@@ -764,7 +760,7 @@ FSR1H                             00000FE2
 FSR1L                             00000FE1
 FSR2                              00000002
 FSR2H                             00000FDA
-MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  16:51:29         PAGE 14
+MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  18:15:22         PAGE 14
 
 
 SYMBOL TABLE
@@ -823,7 +819,7 @@ INT2P                             00000007
 INT3                              00000003
 INT3E                             00000005
 INT3F                             00000002
-MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  16:51:29         PAGE 15
+MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  18:15:22         PAGE 15
 
 
 SYMBOL TABLE
@@ -882,7 +878,7 @@ LATB4                             00000004
 LATB5                             00000005
 LATB6                             00000006
 LATB7                             00000007
-MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  16:51:29         PAGE 16
+MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  18:15:22         PAGE 16
 
 
 SYMBOL TABLE
@@ -941,7 +937,7 @@ LATH7                             00000007
 LATJ                              00000F91
 LATJ0                             00000000
 LATJ1                             00000001
-MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  16:51:29         PAGE 17
+MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  18:15:22         PAGE 17
 
 
 SYMBOL TABLE
@@ -958,7 +954,6 @@ LEFT                              00000006
 LVDIE                             00000002
 LVDIF                             00000002
 LVDIP                             00000002
-Left                              00000032
 MEMCON                            00000F26
 MFIOFS                            00000001
 MFIOSEL                           00000000
@@ -1000,13 +995,13 @@ NOT_WRITE                         00000002
 OBF                               00000006
 ODCON1                            00000F29
 ODCON2                            00000F28
-MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  16:51:29         PAGE 18
+ODCON3                            00000F27
+MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  18:15:22         PAGE 18
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
-ODCON3                            00000F27
 OE                                00000001
 OERR                              00000001
 OERR1                             00000001
@@ -1059,13 +1054,13 @@ P3DC3                             00000003
 P3DC4                             00000004
 P3DC5                             00000005
 P3DC6                             00000006
-MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  16:51:29         PAGE 19
+P3M0                              00000006
+MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  18:15:22         PAGE 19
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
-P3M0                              00000006
 P3M1                              00000007
 P3RSEN                            00000007
 PA3                               00000000
@@ -1118,13 +1113,13 @@ PORTG                             00000F86
 PORTH                             00000F87
 PORTJ                             00000F88
 POSTDEC0                          00000FED
-MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  16:51:29         PAGE 20
+POSTDEC1                          00000FE5
+MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  18:15:22         PAGE 20
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
-POSTDEC1                          00000FE5
 POSTDEC2                          00000FDD
 POSTINC0                          00000FEE
 POSTINC1                          00000FE6
@@ -1177,13 +1172,13 @@ R                                 00000002
 RA0                               00000000
 RA1                               00000001
 RA2                               00000002
-MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  16:51:29         PAGE 21
+RA3                               00000003
+MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  18:15:22         PAGE 21
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
-RA3                               00000003
 RA4                               00000004
 RA5                               00000005
 RA6                               00000006
@@ -1236,13 +1231,13 @@ RD16                              00000001
 RD2                               00000002
 RD3                               00000003
 RD4                               00000004
-MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  16:51:29         PAGE 22
+RD5                               00000005
+MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  18:15:22         PAGE 22
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
-RD5                               00000005
 RD6                               00000006
 RD7                               00000007
 RDPU                              00000007
@@ -1295,13 +1290,13 @@ RODIV0                            00000000
 RODIV1                            00000001
 RODIV2                            00000002
 RODIV3                            00000003
-MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  16:51:29         PAGE 23
+ROON                              00000007
+MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  18:15:22         PAGE 23
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
-ROON                              00000007
 ROSEL                             00000004
 ROSSLP                            00000005
 RSEN                              00000001
@@ -1354,13 +1349,13 @@ SEN                               00000000
 SENDB                             00000003
 SENDB1                            00000003
 SENDB2                            00000003
-MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  16:51:29         PAGE 24
+SMP                               00000007
+MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  18:15:22         PAGE 24
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
-SMP                               00000007
 SOSCEN                            00000003
 SOSCGO                            00000003
 SOSCI                             00000001
@@ -1413,13 +1408,13 @@ SSPCON2                           00000FC5
 SSPEN                             00000005
 SSPIE                             00000003
 SSPIF                             00000003
-MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  16:51:29         PAGE 25
+SSPIP                             00000003
+MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  18:15:22         PAGE 25
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
-SSPIP                             00000003
 SSPM0                             00000000
 SSPM1                             00000001
 SSPM2                             00000002
@@ -1472,13 +1467,13 @@ T1CKPS1                           00000005
 T1CON                             00000FCD
 T1G                               00000005
 T1GCON                            00000FAA
-MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  16:51:29         PAGE 26
+T1GGO                             00000003
+MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  18:15:22         PAGE 26
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
-T1GGO                             00000003
 T1GGO_NOT_T1DONE                  00000003
 T1GPOL                            00000006
 T1GSPM                            00000004
@@ -1531,13 +1526,13 @@ T5GVAL                            00000002
 T6CKPS0                           00000000
 T6CKPS1                           00000001
 T6CON                             00000F39
-MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  16:51:29         PAGE 27
+T6OUTPS0                          00000003
+MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  18:15:22         PAGE 27
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
-T6OUTPS0                          00000003
 T6OUTPS1                          00000004
 T6OUTPS2                          00000005
 T6OUTPS3                          00000006
@@ -1590,13 +1585,13 @@ TMR12MD                           00000000
 TMR12ON                           00000002
 TMR1CS0                           00000006
 TMR1CS1                           00000007
-MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  16:51:29         PAGE 28
+TMR1GE                            00000007
+MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  18:15:22         PAGE 28
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
-TMR1GE                            00000007
 TMR1GIE                           00000002
 TMR1GIF                           00000002
 TMR1GIP                           00000002
@@ -1649,13 +1644,13 @@ TMR5MD                            00000003
 TMR5ON                            00000000
 TMR6                              00000F3B
 TMR6IE                            00000002
-MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  16:51:29         PAGE 29
+TMR6IF                            00000002
+MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  18:15:22         PAGE 29
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
-TMR6IF                            00000002
 TMR6IP                            00000002
 TMR6MD                            00000004
 TMR6ON                            00000002
@@ -1708,13 +1703,13 @@ TRISC                             00000F94
 TRISC0                            00000000
 TRISC1                            00000001
 TRISC2                            00000002
-MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  16:51:29         PAGE 30
+TRISC3                            00000003
+MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  18:15:22         PAGE 30
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
-TRISC3                            00000003
 TRISC4                            00000004
 TRISC5                            00000005
 TRISC6                            00000006
@@ -1767,13 +1762,13 @@ TRISJ2                            00000002
 TRISJ3                            00000003
 TRISJ4                            00000004
 TRISJ5                            00000005
-MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  16:51:29         PAGE 31
+TRISJ6                            00000006
+MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  18:15:22         PAGE 31
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
-TRISJ6                            00000006
 TRISJ7                            00000007
 TRMT                              00000001
 TRMT1                             00000001
@@ -1826,13 +1821,13 @@ ULPWU                             00000000
 UP                                00000003
 VCFG0                             00000004
 VCFG1                             00000005
-MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  16:51:29         PAGE 32
+VDIRMAG                           00000007
+MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  18:15:22         PAGE 32
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
-VDIRMAG                           00000007
 VNCFG                             00000003
 VREF_MINUS                        00000002
 VREF_PLUS                         00000003
@@ -1885,13 +1880,13 @@ _CONFIG4L                         00300006
 _CONFIG5H                         00300009
 _CONFIG5L                         00300008
 _CONFIG6H                         0030000B
-MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  16:51:29         PAGE 33
+_CONFIG6L                         0030000A
+MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  18:15:22         PAGE 33
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
-_CONFIG6L                         0030000A
 _CONFIG7H                         0030000D
 _CONFIG7L                         0030000C
 _CP0_OFF_5L                       000000FF
@@ -1944,13 +1939,13 @@ _FCMEN_OFF_1H                     000000BF
 _FCMEN_ON_1H                      000000FF
 _FOSC_EC1IO_1H                    000000FC
 _FOSC_EC1_1H                      000000FD
-MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  16:51:29         PAGE 34
+_FOSC_EC2IO_1H                    000000FA
+MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  18:15:22         PAGE 34
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
-_FOSC_EC2IO_1H                    000000FA
 _FOSC_EC2_1H                      000000FB
 _FOSC_EC3IO_1H                    000000F4
 _FOSC_EC3_1H                      000000F5
@@ -2003,13 +1998,13 @@ _WDTPS_128_2H                     0000009F
 _WDTPS_131072_2H                  000000C7
 _WDTPS_16384_2H                   000000BB
 _WDTPS_16_2H                      00000093
-MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  16:51:29         PAGE 35
+_WDTPS_1_2H                       00000083
+MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  18:15:22         PAGE 35
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
-_WDTPS_1_2H                       00000083
 _WDTPS_2048_2H                    000000AF
 _WDTPS_256_2H                     000000A3
 _WDTPS_262144_2H                  000000CB
@@ -2050,25 +2045,25 @@ _XINST_OFF_1L                     000000BF
 _XINST_ON_1L                      000000FF
 __18F87K22                        00000001
 arrow_con                         00000020
-curs_fix                          0000007A
+curs_fix                          00000074
 cursor_x                          00000000
 cursor_y                          00000001
-end_return                        00000038
-go_down                           0000004A
-go_down_con                       00000052
-go_left                           0000006A
-go_left_con                       00000072
-go_right                          0000005A
-go_right_con                      00000062
-go_up                             0000003A
-go_up_con                         00000042
-MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  16:51:29         PAGE 36
+end_return                        00000032
+go_down                           00000044
+go_down_con                       0000004C
+go_left                           00000064
+go_left_con                       0000006C
+go_right                          00000054
+go_right_con                      0000005C
+go_up                             00000034
+go_up_con                         0000003C
+logic_setup                       00000000
+MPASM 5.81                  SUDOKU_LOGIC.ASM   2-20-2020  18:15:22         PAGE 36
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
-logic_setup                       00000000
 sudoku_brdfixedp                  00000751
 sudoku_brdplayer                  00000700
 sudoku_brdsolution                00000800

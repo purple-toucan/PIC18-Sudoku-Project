@@ -1,4 +1,4 @@
-MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  15:42:38         PAGE  1
+MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  18:15:22         PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -15,64 +15,65 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00008 ;==========================================================================
                       00009 
                       02986         LIST
-  0000                00002         extern sudoku_brdplayer
-  0000                00003         extern sudoku_brdsolution
+                      00002         
+  0000                00003         global validate
                       00004         
-  0000                00005         global validate
-                      00006         
+  0000                00005         extern sudoku_brdplayer
+  0000                00006         extern sudoku_brdsolution
                       00007         
-                      00008 reserve code    
-                      00009 
-                      00010         
-                      00011 acs0        udata_acs   ; reserve data space in access ram      
-000000                00012 counter     res 1   ;   reserved for counter
-                      00013             
-                      00014 main code
-000000                00015 validate
-000000 0E51           00016     movlw       0x51
-000002 6E??           00017     movwf       counter ;   setting counter to 81
+                      00008 acs0        udata_acs   ; reserve data space in access ram      
+000000                00009 counter     res 1   ;   reserved for counter
+                      00010             
+                      00011 main code
+                      00012 
+000000                00013 validate    ; Check if current board is a valid solution
+000000 0E51           00014     movlw       0x51
+000002 6E??           00015     movwf       counter ;   setting counter to 81
+                      00016 
+000004 EE?? F0??      00017     lfsr        0, sudoku_brdplayer    ;        player board loading into FFSR0
                       00018 
-000004 EE?? F0??      00019     lfsr        0, sudoku_brdplayer    ;        player board loading into FFSR0
-                      00020 
-000008                00021 not_full
-000008 0E00           00022     movlw   0x00
-00000A 0012           00023     return
-                      00024     
-00000C                00025 invalid
-00000C 0E01           00026     movlw   0x01
-00000E 0012           00027     return
-                      00028     
-000010                00029 loop1
-000010 66EE           00030     tstfsz  POSTINC0    ;   tests elements, skips if cell empty
-000012 2E??           00031     decfsz  counter ;   decrement counter by 1 for each cell
-000014 D???           00032     bra     not_full
-000016 D???           00033     bra     loop1    ;  completes loop
-                      00034 
-                      00035 
-000018 0E51           00036     movlw   0x51
-00001A 6E??           00037     movwf   counter ;   setting counter to 81
-                      00038     
-00001C EE?? F0??      00039     lfsr    0,  sudoku_brdplayer    ;   player board loading onto FSR0
-000020 EE?? F0??      00040     lfsr    1,  sudoku_brdsolution  ;   solution board loading onto FSR1
-                      00041     
-000024                00042 loop2
-000024 50EE           00043     movf    POSTINC0, w     ;   move cell into wreg for comparison
-MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  15:42:38         PAGE  2
+000008                00019 loop1
+000008 66EE           00020     tstfsz  POSTINC0    ;   tests elements, skips if cell empty
+00000A D???           00021     bra     pass_empty
+00000C D???           00022     bra     not_full
+00000E                00023 pass_empty
+00000E 2E??           00024     decfsz  counter ;   decrement counter by 1 for each cell
+000010 D???           00025     bra     loop1    ;  completes loop
+                      00026     
+                      00027 
+000012 0E51           00028     movlw   0x51
+000014 6E??           00029     movwf   counter ;   setting counter to 81
+                      00030     
+000016 EE?? F0??      00031     lfsr    0,  sudoku_brdplayer    ;   player board loading onto FSR0
+00001A EE?? F0??      00032     lfsr    1,  sudoku_brdsolution  ;   solution board loading onto FSR1
+                      00033     
+00001E                00034 loop2
+00001E 50EE           00035     movf    POSTINC0, w     ;   move cell into wreg for comparison
+000020 62E6           00036     cpfseq  POSTINC1    ;   skips if both cells are in agreement
+000022 D???           00037     bra     invalid     ;   branch to invalid subroutine
+000024 2E??           00038     decfsz  counter ;   decrement counter
+000026 D???           00039     bra     loop2
+                      00040 
+000028 0E02           00041     movlw       0x02    ;   set w to 2
+00002A 0012           00042     return              ; Board is the correct solution
+                      00043     
+MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  18:15:22         PAGE  2
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-000026 62E6           00044     cpfseq  POSTINC1    ;   skips if both cells are in agreement
-000028 D???           00045     bra     invalid     ;   branch to invalid subroutine
-00002A 2E??           00046     decfsz  counter ;   decrement counter
-00002C D???           00047     bra     loop2
-                      00048 
-00002E 0E02           00049     movlw       0x02    ;   set w to 2
-000030 0012           00050     return
+00002C                00044 not_full
+00002C 0E00           00045     movlw   0x00
+00002E 0012           00046     return
+                      00047     
+000030                00048 invalid
+000030 0E01           00049     movlw   0x01
+000032 0012           00050     return
                       00051     
-                      00052     end
-MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  15:42:38         PAGE  3
+                      00052     
+                      00053     end
+MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  18:15:22         PAGE  3
 
 
 SYMBOL TABLE
@@ -131,7 +132,7 @@ ADMSK5                            00000005
 ADON                              00000000
 ADRES                             00000FC3
 ADRESH                            00000FC4
-MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  15:42:38         PAGE  4
+MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  18:15:22         PAGE  4
 
 
 SYMBOL TABLE
@@ -190,7 +191,7 @@ ANSEL16                           00000000
 ANSEL17                           00000001
 ANSEL18                           00000002
 ANSEL19                           00000003
-MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  15:42:38         PAGE  5
+MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  18:15:22         PAGE  5
 
 
 SYMBOL TABLE
@@ -249,7 +250,7 @@ C1TSEL0                           00000000
 C1TSEL1                           00000001
 C1TSEL2                           00000002
 C2INA                             00000004
-MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  15:42:38         PAGE  6
+MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  18:15:22         PAGE  6
 
 
 SYMBOL TABLE
@@ -308,7 +309,7 @@ CCP1IP                            00000001
 CCP1M0                            00000000
 CCP1M1                            00000001
 CCP1M2                            00000002
-MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  15:42:38         PAGE  7
+MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  18:15:22         PAGE  7
 
 
 SYMBOL TABLE
@@ -367,7 +368,7 @@ CCP5M0                            00000000
 CCP5M1                            00000001
 CCP5M2                            00000002
 CCP5M3                            00000003
-MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  15:42:38         PAGE  8
+MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  18:15:22         PAGE  8
 
 
 SYMBOL TABLE
@@ -426,7 +427,7 @@ CCP9IP                            00000006
 CCP9M0                            00000000
 CCP9M1                            00000001
 CCP9M2                            00000002
-MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  15:42:38         PAGE  9
+MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  18:15:22         PAGE  9
 
 
 SYMBOL TABLE
@@ -485,7 +486,7 @@ CHSN1                             00000001
 CHSN2                             00000002
 CK1                               00000006
 CK2                               00000001
-MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  15:42:38         PAGE 10
+MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  18:15:22         PAGE 10
 
 
 SYMBOL TABLE
@@ -544,7 +545,7 @@ CTMUIE                            00000003
 CTMUIF                            00000003
 CTMUIP                            00000003
 CTMUMD                            00000006
-MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  15:42:38         PAGE 11
+MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  18:15:22         PAGE 11
 
 
 SYMBOL TABLE
@@ -603,7 +604,7 @@ ECCP1AS1                          00000005
 ECCP1AS2                          00000006
 ECCP1ASE                          00000007
 ECCP1CON                          00000FBB
-MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  15:42:38         PAGE 12
+MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  18:15:22         PAGE 12
 
 
 SYMBOL TABLE
@@ -662,7 +663,7 @@ FSR2H                             00000FDA
 FSR2L                             00000FD9
 GCEN                              00000007
 GIE                               00000007
-MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  15:42:38         PAGE 13
+MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  18:15:22         PAGE 13
 
 
 SYMBOL TABLE
@@ -721,7 +722,7 @@ INT3F                             00000002
 INT3IE                            00000005
 INT3IF                            00000002
 INT3IP                            00000001
-MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  15:42:38         PAGE 14
+MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  18:15:22         PAGE 14
 
 
 SYMBOL TABLE
@@ -780,7 +781,7 @@ LATB7                             00000007
 LATC                              00000F8B
 LATC0                             00000000
 LATC1                             00000001
-MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  15:42:38         PAGE 15
+MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  18:15:22         PAGE 15
 
 
 SYMBOL TABLE
@@ -839,7 +840,7 @@ LATJ1                             00000001
 LATJ2                             00000002
 LATJ3                             00000003
 LATJ4                             00000004
-MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  15:42:38         PAGE 16
+MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  18:15:22         PAGE 16
 
 
 SYMBOL TABLE
@@ -898,7 +899,7 @@ OE                                00000001
 OERR                              00000001
 OERR1                             00000001
 OERR2                             00000001
-MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  15:42:38         PAGE 17
+MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  18:15:22         PAGE 17
 
 
 SYMBOL TABLE
@@ -957,7 +958,7 @@ P3M1                              00000007
 P3RSEN                            00000007
 PA3                               00000000
 PADCFG1                           00000F53
-MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  15:42:38         PAGE 18
+MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  18:15:22         PAGE 18
 
 
 SYMBOL TABLE
@@ -1016,7 +1017,7 @@ POSTDEC2                          00000FDD
 POSTINC0                          00000FEE
 POSTINC1                          00000FE6
 POSTINC2                          00000FDE
-MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  15:42:38         PAGE 19
+MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  18:15:22         PAGE 19
 
 
 SYMBOL TABLE
@@ -1075,7 +1076,7 @@ RA4                               00000004
 RA5                               00000005
 RA6                               00000006
 RA7                               00000007
-MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  15:42:38         PAGE 20
+MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  18:15:22         PAGE 20
 
 
 SYMBOL TABLE
@@ -1134,7 +1135,7 @@ RD6                               00000006
 RD7                               00000007
 RDPU                              00000007
 RE0                               00000000
-MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  15:42:38         PAGE 21
+MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  18:15:22         PAGE 21
 
 
 SYMBOL TABLE
@@ -1193,7 +1194,7 @@ ROSSLP                            00000005
 RSEN                              00000001
 RTCC                              00000004
 RTCCAL                            00000F5E
-MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  15:42:38         PAGE 22
+MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  18:15:22         PAGE 22
 
 
 SYMBOL TABLE
@@ -1252,7 +1253,7 @@ SOSCI                             00000001
 SOSCO                             00000000
 SOSCRUN                           00000006
 SP0                               00000000
-MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  15:42:38         PAGE 23
+MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  18:15:22         PAGE 23
 
 
 SYMBOL TABLE
@@ -1311,7 +1312,7 @@ SSPM2                             00000002
 SSPM3                             00000003
 SSPOV                             00000006
 SSPSTAT                           00000FC7
-MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  15:42:38         PAGE 24
+MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  18:15:22         PAGE 24
 
 
 SYMBOL TABLE
@@ -1370,7 +1371,7 @@ T1GSPM                            00000004
 T1GSS0                            00000000
 T1GSS1                            00000001
 T1GTM                             00000005
-MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  15:42:38         PAGE 25
+MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  18:15:22         PAGE 25
 
 
 SYMBOL TABLE
@@ -1429,7 +1430,7 @@ T6OUTPS3                          00000006
 T7CKI                             00000004
 T7CKPS0                           00000004
 T7CKPS1                           00000005
-MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  15:42:38         PAGE 26
+MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  18:15:22         PAGE 26
 
 
 SYMBOL TABLE
@@ -1488,7 +1489,7 @@ TMR1GIP                           00000002
 TMR1H                             00000FCF
 TMR1IE                            00000000
 TMR1IF                            00000000
-MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  15:42:38         PAGE 27
+MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  18:15:22         PAGE 27
 
 
 SYMBOL TABLE
@@ -1547,7 +1548,7 @@ TMR6ON                            00000002
 TMR7                              00000F3E
 TMR7CS0                           00000006
 TMR7CS1                           00000007
-MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  15:42:38         PAGE 28
+MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  18:15:22         PAGE 28
 
 
 SYMBOL TABLE
@@ -1606,7 +1607,7 @@ TRISC6                            00000006
 TRISC7                            00000007
 TRISD                             00000F95
 TRISD0                            00000000
-MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  15:42:38         PAGE 29
+MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  18:15:22         PAGE 29
 
 
 SYMBOL TABLE
@@ -1665,7 +1666,7 @@ TRMT1                             00000001
 TRMT2                             00000001
 TUN0                              00000000
 TUN1                              00000001
-MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  15:42:38         PAGE 30
+MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  18:15:22         PAGE 30
 
 
 SYMBOL TABLE
@@ -1724,7 +1725,7 @@ W                                 00000000
 WAIT0                             00000004
 WAIT1                             00000005
 WCOL                              00000007
-MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  15:42:38         PAGE 31
+MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  18:15:22         PAGE 31
 
 
 SYMBOL TABLE
@@ -1783,7 +1784,7 @@ _CP1_ON_5L                        000000FD
 _CP2_OFF_5L                       000000FF
 _CP2_ON_5L                        000000FB
 _CP3_OFF_5L                       000000FF
-MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  15:42:38         PAGE 32
+MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  18:15:22         PAGE 32
 
 
 SYMBOL TABLE
@@ -1842,7 +1843,7 @@ _FOSC_INTIO1_1H                   000000F9
 _FOSC_INTIO2_1H                   000000F8
 _FOSC_LP_1H                       000000F0
 _FOSC_RCIO_1H                     000000F7
-MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  15:42:38         PAGE 33
+MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  18:15:22         PAGE 33
 
 
 SYMBOL TABLE
@@ -1901,7 +1902,7 @@ _WDTPS_32_2H                      00000097
 _WDTPS_4096_2H                    000000B3
 _WDTPS_4_2H                       0000008B
 _WDTPS_512_2H                     000000A7
-MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  15:42:38         PAGE 34
+MPASM 5.81              BOARD_VALIDATION.ASM   2-20-2020  18:15:22         PAGE 34
 
 
 SYMBOL TABLE
@@ -1938,10 +1939,11 @@ _XINST_OFF_1L                     000000BF
 _XINST_ON_1L                      000000FF
 __18F87K22                        00000001
 counter                           00000000
-invalid                           0000000C
-loop1                             00000010
-loop2                             00000024
-not_full                          00000008
+invalid                           00000030
+loop1                             00000008
+loop2                             0000001E
+not_full                          0000002C
+pass_empty                        0000000E
 sudoku_brdplayer                  00000000
 sudoku_brdsolution                00000000
 validate                          00000000

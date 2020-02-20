@@ -1,3 +1,3 @@
 build/default/production/config.o:  \
-	H:/Laboratory/Year\ 3/Micro\ -\ Not\ Broken/Jac-n-Dak/Sudoku-v1.X/config.asm  \
+	C:/Users/Jac/Documents/PHYSICS/Year\ 3/year\ 3\ labs/Microprocessor/Jac-n-Dak/Sudoku-v1.X/config.asm  \
 

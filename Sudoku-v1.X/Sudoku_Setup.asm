@@ -1,12 +1,13 @@
 #include p18f87k22.inc
+    
+    global  Create_Board
+    
     extern Draw_Grid
     extern Write_Cell
     extern number_name
     extern sudoku_y, sudoku_x
     extern sudoku_brdplayer, sudoku_brdsolution
     extern sudoku_brdfixedp
-    
-    global  Create_Board
     
     constant board_length = .81
 	

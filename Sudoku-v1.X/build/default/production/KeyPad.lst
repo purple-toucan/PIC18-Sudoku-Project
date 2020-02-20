@@ -1,4 +1,4 @@
-MPASM 5.81                        KEYPAD.ASM   2-20-2020  16:51:30         PAGE  1
+MPASM 5.81                        KEYPAD.ASM   2-20-2020  18:15:23         PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -20,36 +20,35 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00004         
                       00005 
                       00006 PMCodeTable code
-                      00007 ;keypad_codes db 0xFF,0xBE,0x77,0xB7,0xD7,0x7B,0xBB,0xDB,0x7D,0xBD,0xDD,0x7E,0xDE,0xEE,0xED,0xEB,0xE7, '
-                             ','0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'
-000000 B777 7BD7 DBBB 00008 keypad_codes db 0x77,0xB7,0xD7,0x7B,0xBB,0xDB,0x7D,0xBD,0xDD, 0xE7,0xDE,0xED,0x7E, 0xEE, 0xAA
+000000 B777 7BD7 DBBB 00007 keypad_codes db 0x77,0xB7,0xD7,0x7B,0xBB,0xDB,0x7D,0xBD,0xDD, 0xE7,0xDE,0xED,0x7E, 0xEE, 0xAA
        BD7D E7DD EDDE 
        EE7E 00AA 
+                      00008 ; keypad characters 1,2,3,4,5,6,7,8,9, F(up),B(right),D(down),A(left), C, O&E
 000010 0201 0403 0605 00009 desired_outputs db .1,.2,.3,.4,.5,.6,.7,.8,.9, 0x41,0x42,0x43,0x44, 0x00, 0xFE
        0807 4109 4342 
        0044 00FE 
-  000F                00010         constant keypad_bytes = .15
-  000F                00011         constant output_bytes = .15
-                      00012                         
-                      00013             
-                      00014 PadLoc   udata_acs      ; reserve data anywhere in access RAM
-000000                00015 counter  res 1          ; reserve one byte for a counter variable
-000001                00016 Temprd   res 1          ; reserve one byte for a counter variable
-000002                00017 delay_count res 1
-000003                00018 previous_input  res 1   ; Key pad code of pervious input
-                      00019 
-                      00020                         
-                      00021 KeyPad_RAM600   udata   0x600    ; reserve data anywhere in RAM (here at 0x400)
-000600                00022 PadCodes res    keypad_bytes + output_bytes
-                      00023         
-                      00024 main    code
-                      00025         
-000000                00026 Delay   
-000000 0E10           00027         movlw   b'00010000'     ;   3.4 us Delay
-000002 6E??           00028         movwf   delay_count
-000004 2E??           00029 dllp1   decfsz  delay_count
-000006 D???           00030         bra     dllp1
-                      00031         
+                      00010 ; outputs           1,2,3,4,5,6,7,8,9, up,right,down,left, Clear, exit
+  000F                00011         constant keypad_bytes = .15
+  000F                00012         constant output_bytes = .15
+                      00013                         
+                      00014             
+                      00015 PadLoc   udata_acs      ; reserve data anywhere in access RAM
+000000                00016 counter  res 1          ; reserve one byte for a counter variable
+000001                00017 Temprd   res 1          ; reserve one byte for a counter variable
+000002                00018 delay_count res 1
+000003                00019 previous_input  res 1   ; Key pad code of pervious input
+                      00020 
+                      00021                         
+                      00022 KeyPad_RAM600   udata   0x600    ; reserve data anywhere in RAM (here at 0x400)
+000600                00023 PadCodes res    keypad_bytes + output_bytes
+                      00024         
+                      00025 main    code
+                      00026         
+000000                00027 Delay   
+000000 0E10           00028         movlw   b'00010000'     ;   3.4 us Delay
+000002 6E??           00029         movwf   delay_count
+000004 2E??           00030 dllp1   decfsz  delay_count
+000006 D???           00031         bra     dllp1
 000008 0012           00032         return
                       00033         
 00000A                00034 PadSetup
@@ -57,160 +56,111 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 00000A 6896           00036         setf    TRISE                   ; Tristates on
 00000C 010F           00037         banksel PADCFG1
 00000E 8D53           00038         bsf     PADCFG1, REPU, BANKED   ; set REPU bit of given byte to 1 ;
-MPASM 5.81                        KEYPAD.ASM   2-20-2020  16:51:30         PAGE  2
+                      00039                                         ; E pull ups on
+MPASM 5.81                        KEYPAD.ASM   2-20-2020  18:15:23         PAGE  2
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-                      00039                                         ; E pull ups on
 000010 6A8D           00040         clrf    LATE                    ; clear LATE
                       00041         
-000012 6A94           00042         clrf    TRISC
-                      00043             
-000014 6A??           00044         clrf    previous_input          ; clear previous input
-                      00045         
-                      00046         ; Read code data form PM to RAM
-000016 EE?? F0??      00047         lfsr    FSR0, PadCodes          ; Load FSR0 with address in RAM 
-                      00048         
-00001A 0E??           00049         movlw   upper(keypad_codes)     ; address of data in PM
-00001C 6EF8           00050         movwf   TBLPTRU                 ; load upper bits to TBLPTRU
-00001E 0E??           00051         movlw   high(keypad_codes)      ; address of data in PM
-000020 6EF7           00052         movwf   TBLPTRH                 ; load high byte to TBLPTRH
-000022 0E??           00053         movlw   low(keypad_codes)       ; address of data in PM
-000024 6EF6           00054         movwf   TBLPTRL                 ; load low byte to TBLPTRL
-000026 0E0F           00055         movlw   keypad_bytes            ; bytes to read
-000028 6E??           00056         movwf   counter                 ; our counter register
-00002A 0009           00057 rdlp1   tblrd*+                         ; one byte from PM to TABLAT, increment TBLPRT
-00002C CFF5 FFEE      00058         movff   TABLAT, POSTINC0        ; move data from TABLAT to (FSR0), inc FSR0     
-000030 2E??           00059         decfsz  counter                 ; count down to zero
-000032 D???           00060         bra     rdlp1                   ; keep going until finished
-                      00061         
-000034 0E??           00062         movlw   upper(desired_outputs)  ; address of data in PM
-000036 6EF8           00063         movwf   TBLPTRU                 ; load upper bits to TBLPTRU
-000038 0E??           00064         movlw   high(desired_outputs)   ; address of data in PM
-00003A 6EF7           00065         movwf   TBLPTRH                 ; load high byte to TBLPTRH
-00003C 0E??           00066         movlw   low(desired_outputs)    ; address of data in PM
-00003E 6EF6           00067         movwf   TBLPTRL                 ; load low byte to TBLPTRL
-000040 0E0F           00068         movlw   output_bytes            ; bytes to read
-000042 6E??           00069         movwf   counter                 ; our counter register
-000044 0009           00070 rdlp2   tblrd*+                         ; one byte from PM to TABLAT, increment TBLPRT
-000046 CFF5 FFEE      00071         movff   TABLAT, POSTINC0        ; move data from TABLAT to (FSR0), inc FSR0     
-00004A 2E??           00072         decfsz  counter                 ; count down to zero
-00004C D???           00073         bra     rdlp2                   ; keep going until finished
+                      00042             
+000012 6A??           00043         clrf    previous_input          ; clear previous input
+                      00044         
+                      00045         ; Read code data form PM to RAM
+000014 EE?? F0??      00046         lfsr    FSR0, PadCodes          ; Load FSR0 with address in RAM 
+                      00047         
+000018 0E??           00048         movlw   upper(keypad_codes)     ; address of data in PM
+00001A 6EF8           00049         movwf   TBLPTRU                 ; load upper bits to TBLPTRU
+00001C 0E??           00050         movlw   high(keypad_codes)      ; address of data in PM
+00001E 6EF7           00051         movwf   TBLPTRH                 ; load high byte to TBLPTRH
+000020 0E??           00052         movlw   low(keypad_codes)       ; address of data in PM
+000022 6EF6           00053         movwf   TBLPTRL                 ; load low byte to TBLPTRL
+000024 0E0F           00054         movlw   keypad_bytes            ; bytes to read
+000026 6E??           00055         movwf   counter                 ; our counter register
+000028 0009           00056 rdlp1   tblrd*+                         ; one byte from PM to TABLAT, increment TBLPRT
+00002A CFF5 FFEE      00057         movff   TABLAT, POSTINC0        ; move data from TABLAT to (FSR0), inc FSR0     
+00002E 2E??           00058         decfsz  counter                 ; count down to zero
+000030 D???           00059         bra     rdlp1                   ; keep going until finished
+                      00060         
+000032 0E??           00061         movlw   upper(desired_outputs)  ; address of data in PM
+000034 6EF8           00062         movwf   TBLPTRU                 ; load upper bits to TBLPTRU
+000036 0E??           00063         movlw   high(desired_outputs)   ; address of data in PM
+000038 6EF7           00064         movwf   TBLPTRH                 ; load high byte to TBLPTRH
+00003A 0E??           00065         movlw   low(desired_outputs)    ; address of data in PM
+00003C 6EF6           00066         movwf   TBLPTRL                 ; load low byte to TBLPTRL
+00003E 0E0F           00067         movlw   output_bytes            ; bytes to read
+000040 6E??           00068         movwf   counter                 ; our counter register
+000042 0009           00069 rdlp2   tblrd*+                         ; one byte from PM to TABLAT, increment TBLPRT
+000044 CFF5 FFEE      00070         movff   TABLAT, POSTINC0        ; move data from TABLAT to (FSR0), inc FSR0     
+000048 2E??           00071         decfsz  counter                 ; count down to zero
+00004A D???           00072         bra     rdlp2                   ; keep going until finished
+                      00073         
                       00074         
-                      00075         
-00004E 0012           00076         return
-                      00077         
-000050                00078 Give_Input
-000050 0E0F           00079         movlw   0x0F                ; Drive columns low
-000052 6E96           00080         movwf   TRISE
-000054 EC?? F???      00081         call    Delay               ; Wait
-000058 5084           00082         movf    PORTE, W            ; Read Rows
-00005A 6E??           00083         movwf   Temprd              ; Overwrite tmeporary storage
-                      00084         
-00005C 0EF0           00085         movlw   0xF0                ; Drive rows low
-00005E 6E96           00086         movwf   TRISE           
-000060 EC?? F???      00087         call    Delay               ; Wait
-000064 5084           00088         movf    PORTE, W            ; Read columns
-000066 26??           00089         addwf   Temprd, F           ; Combine with row data to give keypad code
-                      00090         
-000068 C??? FF82      00091         movff   Temprd, PORTC
-MPASM 5.81                        KEYPAD.ASM   2-20-2020  16:51:30         PAGE  3
+00004C 0012           00075         return
+                      00076         
+00004E                00077 Give_Input
+00004E 0E0F           00078         movlw   0x0F                ; Drive columns low
+000050 6E96           00079         movwf   TRISE
+000052 EC?? F???      00080         call    Delay               ; Wait
+000056 5084           00081         movf    PORTE, W            ; Read Rows
+000058 6E??           00082         movwf   Temprd              ; Overwrite tmeporary storage
+                      00083         
+00005A 0EF0           00084         movlw   0xF0                ; Drive rows low
+00005C 6E96           00085         movwf   TRISE           
+00005E EC?? F???      00086         call    Delay               ; Wait
+000062 5084           00087         movf    PORTE, W            ; Read columns
+000064 26??           00088         addwf   Temprd, F           ; Combine with row data to give keypad code
+                      00089         
+000066 0EFF           00090         movlw   0xFF
+000068 62??           00091         cpfseq  Temprd
+00006A D???           00092         bra     pass_nothing        
+MPASM 5.81                        KEYPAD.ASM   2-20-2020  18:15:23         PAGE  3
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-00006C 0EFF           00092         movlw   0xFF
-00006E 62??           00093         cpfseq  Temprd
-000070 D???           00094         bra     pass_nothing        
-                      00095                                     ; Nothing is being pressed
-000072 6A??           00096         clrf    previous_input      ; Clear previous input
-000074 D???           00097         bra     no_action           ; Take no action
+                      00093                                     ; Nothing is being pressed
+00006C 6A??           00094         clrf    previous_input      ; Clear previous input
+00006E D???           00095         bra     no_action           ; Take no action
+                      00096         
+000070                00097 pass_nothing    ; Something has been pressed
                       00098         
-000076                00099 pass_nothing    ; Something has been pressed
-                      00100         
-000076 50??           00101         movf    Temprd, w
-000078 62??           00102         cpfseq  previous_input
-00007A D???           00103         bra     pass_repeat
-00007C D???           00104         bra     no_action           ; Button press is a repeat
+000070 50??           00099         movf    Temprd, w
+000072 62??           00100         cpfseq  previous_input
+000074 D???           00101         bra     pass_repeat
+000076 D???           00102         bra     no_action           ; Button press is a repeat
+                      00103         
+000078                00104 pass_repeat     ; Button Press is not a repeat
                       00105         
-00007E                00106 pass_repeat     ; Button Press is not a repeat
+000078 C??? F???      00106         movff   Temprd, previous_input  ;overwrite previous input
                       00107         
-00007E C??? F???      00108         movff   Temprd, previous_input  ;overwrite previous input
+00007C EE?? F0??      00108         lfsr    FSR0, PadCodes
                       00109         
-000082 EE?? F0??      00110         lfsr    FSR0, PadCodes
-                      00111         
-000086 0E0F           00112         movlw   keypad_bytes
-000088 6E??           00113         movwf   counter
-00008A                00114 libloop 
-00008A 50EE           00115         movf    POSTINC0, W         ; Load keypad input code to w
-00008C 62??           00116         cpfseq  Temprd              ; Compair to input
-00008E D???           00117         bra     pass_compare
-                      00118         
-000090 0E0E           00119         movlw   keypad_bytes -1     ; Offset by 0utput code
-000092 50EB           00120         movf    PLUSW0, W           ; Load ASCII to W
-000094 0012           00121         return
+000080 0E0F           00110         movlw   keypad_bytes
+000082 6E??           00111         movwf   counter
+000084                00112 libloop 
+000084 50EE           00113         movf    POSTINC0, W         ; Load keypad input code to w
+000086 62??           00114         cpfseq  Temprd              ; Compair to input
+000088 D???           00115         bra     pass_compare
+                      00116         
+00008A 0E0E           00117         movlw   keypad_bytes -1     ; Offset by 0utput code
+00008C 50EB           00118         movf    PLUSW0, W           ; Load ASCII to W
+00008E 0012           00119         return
+                      00120         
+000090                00121 pass_compare
                       00122         
-000096                00123 pass_compare
-                      00124         
-000096 2E??           00125         decfsz  counter
-000098 D???           00126         bra     libloop
-00009A D???           00127         bra     no_action           ; no match found
-                      00128         
-00009C                00129 no_action
-00009C 0CFF           00130         retlw   0xFF                ; return with statement of no input on W
-                      00131         
-                      00132         
-                      00133 ;ReadPad
-                      00134 ;       movlw   0x0F                ; Drive columns low
-                      00135 ;       movwf   TRISE
-                      00136 ;       call    Delay               ; Wait
-                      00137 ;       movf    PORTE, W            ; Read Rows
-                      00138 ;       movwf   Temprd              ; Overwrite tmeporary storage
-                      00139 ;       
-                      00140 ;       movlw   0xF0                ; Drive rows low
-                      00141 ;       movwf   TRISE           
-                      00142 ;       call    Delay               ; Wait
-                      00143 ;       movf    PORTE, W            ; Read columns
-                      00144 ;       addwf   Temprd, F           ; Combine with row data
-MPASM 5.81                        KEYPAD.ASM   2-20-2020  16:51:30         PAGE  4
-
-
-LOC  OBJECT CODE     LINE SOURCE TEXT
-  VALUE
-
-                      00145 ;       
-                      00146 ;       movff   Temprd, PORTH
-                      00147 ;       
-                      00148 ;       movlw   0x00                ; Setting counter to zero
-                      00149 ;       movwf   counter
-                      00150 ;       
-                      00151 ;       lfsr    FSR0, PadCodes
-                      00152 ;       
-                      00153 ;libloop        movlw   0x10                
-                      00154 ;       cpfsgt  counter             ; If counter is > than 16, no code matches
-                      00155 ;       bra     Lib1
-                      00156 ;       movlw   0xFF                ; Error code and exit
-                      00157 ;       return
-                      00158 ;       
-                      00159 ;Lib1   movf    POSTINC0, W         ; Load keypad input code to w
-                      00160 ;       cpfseq  Temprd              ; Compair to input
-                      00161 ;       bra     Lib2
-                      00162 ;       movlw   0x10                ; Offset by 17 to find ACSII
-                      00163 ;       movf    PLUSW0, W           ; Load ASCII to W
-                      00164 ;       return
-                      00165 ;       
-                      00166 ;Lib2   incf    counter             ; Current position not a match
-                      00167 ;       bra     libloop
-                      00168 ;       
-                      00169 ;       return
-                      00170         
-                      00171 
-                      00172         
-                      00173     end
-MPASM 5.81                        KEYPAD.ASM   2-20-2020  16:51:30         PAGE  5
+000090 2E??           00123         decfsz  counter
+000092 D???           00124         bra     libloop
+000094 D???           00125         bra     no_action           ; no match found
+                      00126         
+000096                00127 no_action
+000096 0CFF           00128         retlw   0xFF                ; return with statement of no input on W
+                      00129         
+                      00130     end
+MPASM 5.81                        KEYPAD.ASM   2-20-2020  18:15:23         PAGE  4
 
 
 SYMBOL TABLE
@@ -269,7 +219,7 @@ ADMSK5                            00000005
 ADON                              00000000
 ADRES                             00000FC3
 ADRESH                            00000FC4
-MPASM 5.81                        KEYPAD.ASM   2-20-2020  16:51:30         PAGE  6
+MPASM 5.81                        KEYPAD.ASM   2-20-2020  18:15:23         PAGE  5
 
 
 SYMBOL TABLE
@@ -328,7 +278,7 @@ ANSEL16                           00000000
 ANSEL17                           00000001
 ANSEL18                           00000002
 ANSEL19                           00000003
-MPASM 5.81                        KEYPAD.ASM   2-20-2020  16:51:30         PAGE  7
+MPASM 5.81                        KEYPAD.ASM   2-20-2020  18:15:23         PAGE  6
 
 
 SYMBOL TABLE
@@ -387,7 +337,7 @@ C1TSEL0                           00000000
 C1TSEL1                           00000001
 C1TSEL2                           00000002
 C2INA                             00000004
-MPASM 5.81                        KEYPAD.ASM   2-20-2020  16:51:30         PAGE  8
+MPASM 5.81                        KEYPAD.ASM   2-20-2020  18:15:23         PAGE  7
 
 
 SYMBOL TABLE
@@ -446,7 +396,7 @@ CCP1IP                            00000001
 CCP1M0                            00000000
 CCP1M1                            00000001
 CCP1M2                            00000002
-MPASM 5.81                        KEYPAD.ASM   2-20-2020  16:51:30         PAGE  9
+MPASM 5.81                        KEYPAD.ASM   2-20-2020  18:15:23         PAGE  8
 
 
 SYMBOL TABLE
@@ -505,7 +455,7 @@ CCP5M0                            00000000
 CCP5M1                            00000001
 CCP5M2                            00000002
 CCP5M3                            00000003
-MPASM 5.81                        KEYPAD.ASM   2-20-2020  16:51:30         PAGE 10
+MPASM 5.81                        KEYPAD.ASM   2-20-2020  18:15:23         PAGE  9
 
 
 SYMBOL TABLE
@@ -564,7 +514,7 @@ CCP9IP                            00000006
 CCP9M0                            00000000
 CCP9M1                            00000001
 CCP9M2                            00000002
-MPASM 5.81                        KEYPAD.ASM   2-20-2020  16:51:30         PAGE 11
+MPASM 5.81                        KEYPAD.ASM   2-20-2020  18:15:23         PAGE 10
 
 
 SYMBOL TABLE
@@ -623,7 +573,7 @@ CHSN1                             00000001
 CHSN2                             00000002
 CK1                               00000006
 CK2                               00000001
-MPASM 5.81                        KEYPAD.ASM   2-20-2020  16:51:30         PAGE 12
+MPASM 5.81                        KEYPAD.ASM   2-20-2020  18:15:23         PAGE 11
 
 
 SYMBOL TABLE
@@ -682,7 +632,7 @@ CTMUIE                            00000003
 CTMUIF                            00000003
 CTMUIP                            00000003
 CTMUMD                            00000006
-MPASM 5.81                        KEYPAD.ASM   2-20-2020  16:51:30         PAGE 13
+MPASM 5.81                        KEYPAD.ASM   2-20-2020  18:15:23         PAGE 12
 
 
 SYMBOL TABLE
@@ -741,7 +691,7 @@ ECCP1AS0                          00000004
 ECCP1AS1                          00000005
 ECCP1AS2                          00000006
 ECCP1ASE                          00000007
-MPASM 5.81                        KEYPAD.ASM   2-20-2020  16:51:30         PAGE 14
+MPASM 5.81                        KEYPAD.ASM   2-20-2020  18:15:23         PAGE 13
 
 
 SYMBOL TABLE
@@ -800,7 +750,7 @@ FSR2                              00000002
 FSR2H                             00000FDA
 FSR2L                             00000FD9
 GCEN                              00000007
-MPASM 5.81                        KEYPAD.ASM   2-20-2020  16:51:30         PAGE 15
+MPASM 5.81                        KEYPAD.ASM   2-20-2020  18:15:23         PAGE 14
 
 
 SYMBOL TABLE
@@ -812,7 +762,7 @@ GIEL                              00000006
 GIE_GIEH                          00000007
 GO                                00000001
 GO_NOT_DONE                       00000001
-Give_Input                        00000050
+Give_Input                        0000004E
 HALFSEC                           00000003
 HFIOFS                            00000002
 HLVDCON                           00000FA8
@@ -859,7 +809,7 @@ INT3                              00000003
 INT3E                             00000005
 INT3F                             00000002
 INT3IE                            00000005
-MPASM 5.81                        KEYPAD.ASM   2-20-2020  16:51:30         PAGE 16
+MPASM 5.81                        KEYPAD.ASM   2-20-2020  18:15:23         PAGE 15
 
 
 SYMBOL TABLE
@@ -918,7 +868,7 @@ LATB5                             00000005
 LATB6                             00000006
 LATB7                             00000007
 LATC                              00000F8B
-MPASM 5.81                        KEYPAD.ASM   2-20-2020  16:51:30         PAGE 17
+MPASM 5.81                        KEYPAD.ASM   2-20-2020  18:15:23         PAGE 16
 
 
 SYMBOL TABLE
@@ -977,7 +927,7 @@ LATJ                              00000F91
 LATJ0                             00000000
 LATJ1                             00000001
 LATJ2                             00000002
-MPASM 5.81                        KEYPAD.ASM   2-20-2020  16:51:30         PAGE 18
+MPASM 5.81                        KEYPAD.ASM   2-20-2020  18:15:23         PAGE 17
 
 
 SYMBOL TABLE
@@ -1036,7 +986,7 @@ ODCON2                            00000F28
 ODCON3                            00000F27
 OE                                00000001
 OERR                              00000001
-MPASM 5.81                        KEYPAD.ASM   2-20-2020  16:51:30         PAGE 19
+MPASM 5.81                        KEYPAD.ASM   2-20-2020  18:15:23         PAGE 18
 
 
 SYMBOL TABLE
@@ -1095,7 +1045,7 @@ P3DC6                             00000006
 P3M0                              00000006
 P3M1                              00000007
 P3RSEN                            00000007
-MPASM 5.81                        KEYPAD.ASM   2-20-2020  16:51:30         PAGE 20
+MPASM 5.81                        KEYPAD.ASM   2-20-2020  18:15:23         PAGE 19
 
 
 SYMBOL TABLE
@@ -1154,7 +1104,7 @@ POSTDEC0                          00000FED
 POSTDEC1                          00000FE5
 POSTDEC2                          00000FDD
 POSTINC0                          00000FEE
-MPASM 5.81                        KEYPAD.ASM   2-20-2020  16:51:30         PAGE 21
+MPASM 5.81                        KEYPAD.ASM   2-20-2020  18:15:23         PAGE 20
 
 
 SYMBOL TABLE
@@ -1213,7 +1163,7 @@ RA0                               00000000
 RA1                               00000001
 RA2                               00000002
 RA3                               00000003
-MPASM 5.81                        KEYPAD.ASM   2-20-2020  16:51:30         PAGE 22
+MPASM 5.81                        KEYPAD.ASM   2-20-2020  18:15:23         PAGE 21
 
 
 SYMBOL TABLE
@@ -1272,7 +1222,7 @@ RD2                               00000002
 RD3                               00000003
 RD4                               00000004
 RD5                               00000005
-MPASM 5.81                        KEYPAD.ASM   2-20-2020  16:51:30         PAGE 23
+MPASM 5.81                        KEYPAD.ASM   2-20-2020  18:15:23         PAGE 22
 
 
 SYMBOL TABLE
@@ -1331,7 +1281,7 @@ RODIV2                            00000002
 RODIV3                            00000003
 ROON                              00000007
 ROSEL                             00000004
-MPASM 5.81                        KEYPAD.ASM   2-20-2020  16:51:30         PAGE 24
+MPASM 5.81                        KEYPAD.ASM   2-20-2020  18:15:23         PAGE 23
 
 
 SYMBOL TABLE
@@ -1390,7 +1340,7 @@ SENDB2                            00000003
 SMP                               00000007
 SOSCEN                            00000003
 SOSCGO                            00000003
-MPASM 5.81                        KEYPAD.ASM   2-20-2020  16:51:30         PAGE 25
+MPASM 5.81                        KEYPAD.ASM   2-20-2020  18:15:23         PAGE 24
 
 
 SYMBOL TABLE
@@ -1449,7 +1399,7 @@ SSPIF                             00000003
 SSPIP                             00000003
 SSPM0                             00000000
 SSPM1                             00000001
-MPASM 5.81                        KEYPAD.ASM   2-20-2020  16:51:30         PAGE 26
+MPASM 5.81                        KEYPAD.ASM   2-20-2020  18:15:23         PAGE 25
 
 
 SYMBOL TABLE
@@ -1508,7 +1458,7 @@ T1GCON                            00000FAA
 T1GGO                             00000003
 T1GGO_NOT_T1DONE                  00000003
 T1GPOL                            00000006
-MPASM 5.81                        KEYPAD.ASM   2-20-2020  16:51:30         PAGE 27
+MPASM 5.81                        KEYPAD.ASM   2-20-2020  18:15:23         PAGE 26
 
 
 SYMBOL TABLE
@@ -1567,7 +1517,7 @@ T6CON                             00000F39
 T6OUTPS0                          00000003
 T6OUTPS1                          00000004
 T6OUTPS2                          00000005
-MPASM 5.81                        KEYPAD.ASM   2-20-2020  16:51:30         PAGE 28
+MPASM 5.81                        KEYPAD.ASM   2-20-2020  18:15:23         PAGE 27
 
 
 SYMBOL TABLE
@@ -1626,7 +1576,7 @@ TMR1CS1                           00000007
 TMR1GE                            00000007
 TMR1GIE                           00000002
 TMR1GIF                           00000002
-MPASM 5.81                        KEYPAD.ASM   2-20-2020  16:51:30         PAGE 29
+MPASM 5.81                        KEYPAD.ASM   2-20-2020  18:15:23         PAGE 28
 
 
 SYMBOL TABLE
@@ -1685,7 +1635,7 @@ TMR6IE                            00000002
 TMR6IF                            00000002
 TMR6IP                            00000002
 TMR6MD                            00000004
-MPASM 5.81                        KEYPAD.ASM   2-20-2020  16:51:30         PAGE 30
+MPASM 5.81                        KEYPAD.ASM   2-20-2020  18:15:23         PAGE 29
 
 
 SYMBOL TABLE
@@ -1744,7 +1694,7 @@ TRISC2                            00000002
 TRISC3                            00000003
 TRISC4                            00000004
 TRISC5                            00000005
-MPASM 5.81                        KEYPAD.ASM   2-20-2020  16:51:30         PAGE 31
+MPASM 5.81                        KEYPAD.ASM   2-20-2020  18:15:23         PAGE 30
 
 
 SYMBOL TABLE
@@ -1803,7 +1753,7 @@ TRISJ5                            00000005
 TRISJ6                            00000006
 TRISJ7                            00000007
 TRMT                              00000001
-MPASM 5.81                        KEYPAD.ASM   2-20-2020  16:51:30         PAGE 32
+MPASM 5.81                        KEYPAD.ASM   2-20-2020  18:15:23         PAGE 31
 
 
 SYMBOL TABLE
@@ -1862,7 +1812,7 @@ VCFG1                             00000005
 VDIRMAG                           00000007
 VNCFG                             00000003
 VREF_MINUS                        00000002
-MPASM 5.81                        KEYPAD.ASM   2-20-2020  16:51:30         PAGE 33
+MPASM 5.81                        KEYPAD.ASM   2-20-2020  18:15:23         PAGE 32
 
 
 SYMBOL TABLE
@@ -1921,7 +1871,7 @@ _CONFIG7H                         0030000D
 _CONFIG7L                         0030000C
 _CP0_OFF_5L                       000000FF
 _CP0_ON_5L                        000000FE
-MPASM 5.81                        KEYPAD.ASM   2-20-2020  16:51:30         PAGE 34
+MPASM 5.81                        KEYPAD.ASM   2-20-2020  18:15:23         PAGE 33
 
 
 SYMBOL TABLE
@@ -1980,7 +1930,7 @@ _FOSC_EC2_1H                      000000FB
 _FOSC_EC3IO_1H                    000000F4
 _FOSC_EC3_1H                      000000F5
 _FOSC_HS1_1H                      000000F3
-MPASM 5.81                        KEYPAD.ASM   2-20-2020  16:51:30         PAGE 35
+MPASM 5.81                        KEYPAD.ASM   2-20-2020  18:15:23         PAGE 34
 
 
 SYMBOL TABLE
@@ -2039,7 +1989,7 @@ _WDTPS_2048_2H                    000000AF
 _WDTPS_256_2H                     000000A3
 _WDTPS_262144_2H                  000000CB
 _WDTPS_2_2H                       00000087
-MPASM 5.81                        KEYPAD.ASM   2-20-2020  16:51:30         PAGE 36
+MPASM 5.81                        KEYPAD.ASM   2-20-2020  18:15:23         PAGE 35
 
 
 SYMBOL TABLE
@@ -2086,17 +2036,17 @@ desired_outputs                   00000010
 dllp1                             00000004
 keypad_bytes                      0000000F
 keypad_codes                      00000000
-libloop                           0000008A
-no_action                         0000009C
+libloop                           00000084
+no_action                         00000096
 output_bytes                      0000000F
-pass_compare                      00000096
-pass_nothing                      00000076
-pass_repeat                       0000007E
+pass_compare                      00000090
+pass_nothing                      00000070
+pass_repeat                       00000078
 previous_input                    00000003
-rdlp1                             0000002A
-rdlp2                             00000044
+rdlp1                             00000028
+rdlp2                             00000042
 
-MPASM 5.81                        KEYPAD.ASM   2-20-2020  16:51:30         PAGE 37
+MPASM 5.81                        KEYPAD.ASM   2-20-2020  18:15:23         PAGE 36
 
 
 

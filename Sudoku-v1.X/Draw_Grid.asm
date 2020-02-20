@@ -1,9 +1,10 @@
 #include p18f87k22.inc
 	
+	global Draw_Grid
+	
 	extern Set_GLCD_Cursor_X, Set_GLCD_Cursor_Y
 	extern Send_Data
 	
-	global Draw_Grid
     
 acs0	    udata_acs   ; reserve data space in access ram
 current_row	    res 1
@@ -15,7 +16,7 @@ internal_block_count res 1
 	
 grid	code
  
-Draw_Grid
+Draw_Grid   ; Draw Empty Suduko Grid
 	
 	movlw	0x00
 	movwf	current_row

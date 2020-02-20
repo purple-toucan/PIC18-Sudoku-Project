@@ -1,12 +1,12 @@
 	#include p18f87k22.inc
-
-	extern Write_Cursor
 		
 	global	cursor_x, cursor_y
 	global	sudoku_brdplayer, sudoku_brdsolution
 	global	sudoku_brdfixedp
 	global	update_game
 	global	logic_setup
+	
+	extern Write_Cursor
 	
 	
 reserve code
@@ -66,12 +66,8 @@ Down
     bra	    go_down
 Right
     cpfseq  RIGHT
-    bra	    Left
-    bra	    go_right
-Left
-    cpfseq  LEFT
-    nop
     bra	    go_left
+    bra	    go_right
     
 end_return
     return

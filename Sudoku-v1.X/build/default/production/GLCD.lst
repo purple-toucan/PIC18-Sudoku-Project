@@ -1,4 +1,4 @@
-MPASM 5.81                          GLCD.ASM   2-20-2020  15:42:38         PAGE  1
+MPASM 5.81                          GLCD.ASM   2-20-2020  18:15:23         PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -57,7 +57,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00041 
 000008 EC?? F???      00042         call    Delay
                       00043         
-MPASM 5.81                          GLCD.ASM   2-20-2020  15:42:38         PAGE  2
+MPASM 5.81                          GLCD.ASM   2-20-2020  18:15:23         PAGE  2
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -80,7 +80,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00058         
 000024 0012           00059         return
                       00060         
-000026                00061 Clear_Board ; Clear Every Cell on Current Side of Board
+000026                00061 Clear_Board ; Clear Every Pixel on Current Side of Board
 000026 6A??           00062         clrf    test_row_count  ; Row Counter = 0
                       00063         
 000028                00064 rclrlp      ; Iterate Over Rows
@@ -116,7 +116,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 00005A D???           00094         bra     wblp
                       00095         
 00005C 0012           00096         return
-MPASM 5.81                          GLCD.ASM   2-20-2020  15:42:38         PAGE  3
+MPASM 5.81                          GLCD.ASM   2-20-2020  18:15:23         PAGE  3
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -161,7 +161,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 00008E 0012           00133         return
                       00134         
                       00135         
-000090                00136 Test_Write                      ; Write Two Numbers to Board
+000090                00136 Test_Write      ; Write Two Numbers to Board
                       00137         
 000090 EC?? F???      00138         call    Reset_GLCD_Cursor
                       00139         
@@ -175,7 +175,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 0000A8 EC?? F???      00147         call    Send_Data
 0000AC 0E2A           00148         movlw   b'00101010'
 0000AE EC?? F???      00149         call    Send_Data
-MPASM 5.81                          GLCD.ASM   2-20-2020  15:42:38         PAGE  4
+MPASM 5.81                          GLCD.ASM   2-20-2020  18:15:23         PAGE  4
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -229,12 +229,12 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 00010E 0012           00195         return
                       00196         
                       00197         
-000110                00198 Reset_GLCD_Cursor
+000110                00198 Reset_GLCD_Cursor   ; Move GLCD Cursor to top left corner of GLCD
 000110 0EB8           00199         movlw   b'10111000'
 000112 EC?? F???      00200         call    Send_Instr
 000116 0E40           00201         movlw   b'01000000'
 000118 EC?? F???      00202         call    Send_Instr
-MPASM 5.81                          GLCD.ASM   2-20-2020  15:42:38         PAGE  5
+MPASM 5.81                          GLCD.ASM   2-20-2020  18:15:23         PAGE  5
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -274,40 +274,34 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 00014E EC?? F???      00234         call    Delay
 000152 0012           00235         return
                       00236         
-000154                00237 Delay   
-000154 0E10           00238         movlw   b'00010000'     ;   3.4 us Delay
+000154                00237 Delay   ;   3.4 us Delay
+000154 0E10           00238         movlw   b'00010000'     
 000156 6E??           00239         movwf   delay_count
 000158 2E??           00240 dllp1   decfsz  delay_count
 00015A D???           00241         bra     dllp1
-                      00242 ;;      
-                      00243 ;       
-                      00244 ;;      movlw   0xFF    ;   32us Delay
-                      00245 ;       movff   PORTJ, delay_count
-                      00246 ;dllp1  decfsz  delay_count
-                      00247 ;       bra     dllp1
-                      00248 ;;      
-                      00249 ;       movlw   0xFF    
-                      00250 ;       movwf   delay_count1
-                      00251 ;dllp1  
-                      00252 ;       movlw   0xFF    
-                      00253 ;       movwf   delay_count2
-                      00254 ;       
-                      00255 ;dllp2  decfsz  delay_count2
-MPASM 5.81                          GLCD.ASM   2-20-2020  15:42:38         PAGE  6
+                      00242 
+                      00243 ;       movlw   0xFF    
+                      00244 ;       movwf   delay_count1
+                      00245 ;dllp1  
+                      00246 ;       movlw   0xFF    
+                      00247 ;       movwf   delay_count2
+                      00248 ;       
+                      00249 ;dllp2  decfsz  delay_count2
+                      00250 ;       bra     dllp2
+                      00251 ;       
+                      00252 ;       decfsz  delay_count1
+                      00253 ;       bra     dllp1
+                      00254 
+00015C 0012           00255         return
+MPASM 5.81                          GLCD.ASM   2-20-2020  18:15:23         PAGE  6
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-                      00256 ;       bra     dllp2
-                      00257 ;       
-                      00258 ;       decfsz  delay_count1
-                      00259 ;       bra     dllp1
-                      00260 
-00015C 0012           00261         return
-                      00262         
-                      00263         end
-MPASM 5.81                          GLCD.ASM   2-20-2020  15:42:38         PAGE  7
+                      00256         
+                      00257         end
+MPASM 5.81                          GLCD.ASM   2-20-2020  18:15:23         PAGE  7
 
 
 SYMBOL TABLE
@@ -366,7 +360,7 @@ ADMSK5                            00000005
 ADON                              00000000
 ADRES                             00000FC3
 ADRESH                            00000FC4
-MPASM 5.81                          GLCD.ASM   2-20-2020  15:42:38         PAGE  8
+MPASM 5.81                          GLCD.ASM   2-20-2020  18:15:23         PAGE  8
 
 
 SYMBOL TABLE
@@ -425,7 +419,7 @@ ANSEL16                           00000000
 ANSEL17                           00000001
 ANSEL18                           00000002
 ANSEL19                           00000003
-MPASM 5.81                          GLCD.ASM   2-20-2020  15:42:38         PAGE  9
+MPASM 5.81                          GLCD.ASM   2-20-2020  18:15:23         PAGE  9
 
 
 SYMBOL TABLE
@@ -484,7 +478,7 @@ C1TSEL0                           00000000
 C1TSEL1                           00000001
 C1TSEL2                           00000002
 C2INA                             00000004
-MPASM 5.81                          GLCD.ASM   2-20-2020  15:42:38         PAGE 10
+MPASM 5.81                          GLCD.ASM   2-20-2020  18:15:23         PAGE 10
 
 
 SYMBOL TABLE
@@ -543,7 +537,7 @@ CCP1IP                            00000001
 CCP1M0                            00000000
 CCP1M1                            00000001
 CCP1M2                            00000002
-MPASM 5.81                          GLCD.ASM   2-20-2020  15:42:38         PAGE 11
+MPASM 5.81                          GLCD.ASM   2-20-2020  18:15:23         PAGE 11
 
 
 SYMBOL TABLE
@@ -602,7 +596,7 @@ CCP5M0                            00000000
 CCP5M1                            00000001
 CCP5M2                            00000002
 CCP5M3                            00000003
-MPASM 5.81                          GLCD.ASM   2-20-2020  15:42:38         PAGE 12
+MPASM 5.81                          GLCD.ASM   2-20-2020  18:15:23         PAGE 12
 
 
 SYMBOL TABLE
@@ -661,7 +655,7 @@ CCP9IP                            00000006
 CCP9M0                            00000000
 CCP9M1                            00000001
 CCP9M2                            00000002
-MPASM 5.81                          GLCD.ASM   2-20-2020  15:42:38         PAGE 13
+MPASM 5.81                          GLCD.ASM   2-20-2020  18:15:23         PAGE 13
 
 
 SYMBOL TABLE
@@ -720,7 +714,7 @@ CHSN1                             00000001
 CHSN2                             00000002
 CK1                               00000006
 CK2                               00000001
-MPASM 5.81                          GLCD.ASM   2-20-2020  15:42:38         PAGE 14
+MPASM 5.81                          GLCD.ASM   2-20-2020  18:15:23         PAGE 14
 
 
 SYMBOL TABLE
@@ -779,7 +773,7 @@ CTMUIE                            00000003
 CTMUIF                            00000003
 CTMUIP                            00000003
 CTMUMD                            00000006
-MPASM 5.81                          GLCD.ASM   2-20-2020  15:42:38         PAGE 15
+MPASM 5.81                          GLCD.ASM   2-20-2020  18:15:23         PAGE 15
 
 
 SYMBOL TABLE
@@ -838,7 +832,7 @@ ECCP1AS                           00000FBF
 ECCP1AS0                          00000004
 ECCP1AS1                          00000005
 ECCP1AS2                          00000006
-MPASM 5.81                          GLCD.ASM   2-20-2020  15:42:38         PAGE 16
+MPASM 5.81                          GLCD.ASM   2-20-2020  18:15:23         PAGE 16
 
 
 SYMBOL TABLE
@@ -897,7 +891,7 @@ FSR1H                             00000FE2
 FSR1L                             00000FE1
 FSR2                              00000002
 FSR2H                             00000FDA
-MPASM 5.81                          GLCD.ASM   2-20-2020  15:42:38         PAGE 17
+MPASM 5.81                          GLCD.ASM   2-20-2020  18:15:23         PAGE 17
 
 
 SYMBOL TABLE
@@ -956,7 +950,7 @@ INT1P                             00000006
 INT2                              00000002
 INT2E                             00000004
 INT2F                             00000001
-MPASM 5.81                          GLCD.ASM   2-20-2020  15:42:38         PAGE 18
+MPASM 5.81                          GLCD.ASM   2-20-2020  18:15:23         PAGE 18
 
 
 SYMBOL TABLE
@@ -1015,7 +1009,7 @@ LATA6                             00000006
 LATA7                             00000007
 LATB                              00000F8A
 LATB0                             00000000
-MPASM 5.81                          GLCD.ASM   2-20-2020  15:42:38         PAGE 19
+MPASM 5.81                          GLCD.ASM   2-20-2020  18:15:23         PAGE 19
 
 
 SYMBOL TABLE
@@ -1074,7 +1068,7 @@ LATH0                             00000000
 LATH1                             00000001
 LATH2                             00000002
 LATH3                             00000003
-MPASM 5.81                          GLCD.ASM   2-20-2020  15:42:38         PAGE 20
+MPASM 5.81                          GLCD.ASM   2-20-2020  18:15:23         PAGE 20
 
 
 SYMBOL TABLE
@@ -1133,7 +1127,7 @@ NOT_T7SYNC                        00000002
 NOT_TO                            00000003
 NOT_TX8                           00000006
 NOT_W                             00000002
-MPASM 5.81                          GLCD.ASM   2-20-2020  15:42:38         PAGE 21
+MPASM 5.81                          GLCD.ASM   2-20-2020  18:15:23         PAGE 21
 
 
 SYMBOL TABLE
@@ -1192,7 +1186,7 @@ P3B                               00000004
 P3C                               00000003
 P3DC0                             00000000
 P3DC1                             00000001
-MPASM 5.81                          GLCD.ASM   2-20-2020  15:42:38         PAGE 22
+MPASM 5.81                          GLCD.ASM   2-20-2020  18:15:23         PAGE 22
 
 
 SYMBOL TABLE
@@ -1251,7 +1245,7 @@ PORTB                             00000F81
 PORTC                             00000F82
 PORTD                             00000F83
 PORTE                             00000F84
-MPASM 5.81                          GLCD.ASM   2-20-2020  15:42:38         PAGE 23
+MPASM 5.81                          GLCD.ASM   2-20-2020  18:15:23         PAGE 23
 
 
 SYMBOL TABLE
@@ -1310,7 +1304,7 @@ PSTR1CON                          00000F9C
 PSTR2CON                          00000F1B
 PSTR3CON                          00000F1A
 PWM1CON                           00000FBE
-MPASM 5.81                          GLCD.ASM   2-20-2020  15:42:38         PAGE 24
+MPASM 5.81                          GLCD.ASM   2-20-2020  18:15:23         PAGE 24
 
 
 SYMBOL TABLE
@@ -1369,7 +1363,7 @@ RCSTA1                            00000FAB
 RCSTA2                            00000F22
 RD                                00000000
 RD0                               00000000
-MPASM 5.81                          GLCD.ASM   2-20-2020  15:42:38         PAGE 25
+MPASM 5.81                          GLCD.ASM   2-20-2020  18:15:23         PAGE 25
 
 
 SYMBOL TABLE
@@ -1428,7 +1422,7 @@ RJ5                               00000005
 RJ6                               00000006
 RJ7                               00000007
 RJPU                              00000005
-MPASM 5.81                          GLCD.ASM   2-20-2020  15:42:38         PAGE 26
+MPASM 5.81                          GLCD.ASM   2-20-2020  18:15:23         PAGE 26
 
 
 SYMBOL TABLE
@@ -1487,7 +1481,7 @@ SDA2                              00000005
 SDI1                              00000004
 SDI2                              00000005
 SDO1                              00000005
-MPASM 5.81                          GLCD.ASM   2-20-2020  15:42:38         PAGE 27
+MPASM 5.81                          GLCD.ASM   2-20-2020  18:15:23         PAGE 27
 
 
 SYMBOL TABLE
@@ -1546,7 +1540,7 @@ SSP2MSK                           00000F69
 SSP2STAT                          00000F68
 SSPADD                            00000FC8
 SSPBUF                            00000FC9
-MPASM 5.81                          GLCD.ASM   2-20-2020  15:42:38         PAGE 28
+MPASM 5.81                          GLCD.ASM   2-20-2020  18:15:23         PAGE 28
 
 
 SYMBOL TABLE
@@ -1605,7 +1599,7 @@ T12CKPS0                          00000000
 T12CKPS1                          00000001
 T12CON                            00000F30
 T12OUTPS0                         00000003
-MPASM 5.81                          GLCD.ASM   2-20-2020  15:42:38         PAGE 29
+MPASM 5.81                          GLCD.ASM   2-20-2020  18:15:23         PAGE 29
 
 
 SYMBOL TABLE
@@ -1664,7 +1658,7 @@ T5G                               00000004
 T5GCON                            00000F7A
 T5GGO                             00000003
 T5GGO_NOT_T5DONE                  00000003
-MPASM 5.81                          GLCD.ASM   2-20-2020  15:42:38         PAGE 30
+MPASM 5.81                          GLCD.ASM   2-20-2020  18:15:23         PAGE 30
 
 
 SYMBOL TABLE
@@ -1723,7 +1717,7 @@ TMR10IE                           00000005
 TMR10IF                           00000005
 TMR10IP                           00000005
 TMR10MD                           00000007
-MPASM 5.81                          GLCD.ASM   2-20-2020  15:42:38         PAGE 31
+MPASM 5.81                          GLCD.ASM   2-20-2020  18:15:23         PAGE 31
 
 
 SYMBOL TABLE
@@ -1782,7 +1776,7 @@ TMR5GE                            00000007
 TMR5GIE                           00000007
 TMR5GIF                           00000007
 TMR5GIP                           00000007
-MPASM 5.81                          GLCD.ASM   2-20-2020  15:42:38         PAGE 32
+MPASM 5.81                          GLCD.ASM   2-20-2020  18:15:23         PAGE 32
 
 
 SYMBOL TABLE
@@ -1841,7 +1835,7 @@ TRISB                             00000F93
 TRISB0                            00000000
 TRISB1                            00000001
 TRISB2                            00000002
-MPASM 5.81                          GLCD.ASM   2-20-2020  15:42:38         PAGE 33
+MPASM 5.81                          GLCD.ASM   2-20-2020  18:15:23         PAGE 33
 
 
 SYMBOL TABLE
@@ -1900,7 +1894,7 @@ TRISH2                            00000002
 TRISH3                            00000003
 TRISH4                            00000004
 TRISH5                            00000005
-MPASM 5.81                          GLCD.ASM   2-20-2020  15:42:38         PAGE 34
+MPASM 5.81                          GLCD.ASM   2-20-2020  18:15:23         PAGE 34
 
 
 SYMBOL TABLE
@@ -1959,7 +1953,7 @@ Test_Write                        00000090
 Test_Write_2                      000000E4
 U1OD                              00000006
 U2OD                              00000007
-MPASM 5.81                          GLCD.ASM   2-20-2020  15:42:38         PAGE 35
+MPASM 5.81                          GLCD.ASM   2-20-2020  18:15:23         PAGE 35
 
 
 SYMBOL TABLE
@@ -2018,7 +2012,7 @@ _BORV_2_2L                        000000F7
 _BORV_3_2L                        000000FF
 _BW_16_3L                         000000FF
 _BW_8_3L                          000000BF
-MPASM 5.81                          GLCD.ASM   2-20-2020  15:42:38         PAGE 36
+MPASM 5.81                          GLCD.ASM   2-20-2020  18:15:23         PAGE 36
 
 
 SYMBOL TABLE
@@ -2077,7 +2071,7 @@ _EBRT4_OFF_7L                     000000FF
 _EBRT4_ON_7L                      000000EF
 _EBRT5_OFF_7L                     000000FF
 _EBRT5_ON_7L                      000000DF
-MPASM 5.81                          GLCD.ASM   2-20-2020  15:42:38         PAGE 37
+MPASM 5.81                          GLCD.ASM   2-20-2020  18:15:23         PAGE 37
 
 
 SYMBOL TABLE
@@ -2136,7 +2130,7 @@ _SOSCSEL_HIGH_1L                  000000FF
 _SOSCSEL_LOW_1L                   000000EF
 _STVREN_OFF_4L                    000000FE
 _STVREN_ON_4L                     000000FF
-MPASM 5.81                          GLCD.ASM   2-20-2020  15:42:38         PAGE 38
+MPASM 5.81                          GLCD.ASM   2-20-2020  18:15:23         PAGE 38
 
 
 SYMBOL TABLE
@@ -2195,7 +2189,7 @@ _XINST_OFF_1L                     000000BF
 _XINST_ON_1L                      000000FF
 __18F87K22                        00000001
 block_count                       00000005
-MPASM 5.81                          GLCD.ASM   2-20-2020  15:42:38         PAGE 39
+MPASM 5.81                          GLCD.ASM   2-20-2020  18:15:23         PAGE 39
 
 
 SYMBOL TABLE

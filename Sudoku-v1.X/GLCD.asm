@@ -58,7 +58,7 @@ GLCD_Setup
 	
 	return
 	
-Clear_Board ; Clear Every Cell on Current Side of Board
+Clear_Board ; Clear Every Pixel on Current Side of Board
 	clrf	test_row_count	; Row Counter = 0
 	
 rclrlp	    ; Iterate Over Rows
@@ -133,7 +133,7 @@ rblp	bsf	LATB, GLCD_E   	; Enable Pin High
 	return
 	
 	
-Test_Write			; Write Two Numbers to Board
+Test_Write	; Write Two Numbers to Board
 	
 	call	Reset_GLCD_Cursor
 	
@@ -195,7 +195,7 @@ rplp	movf	test_col_count, w
 	return
 	
 	
-Reset_GLCD_Cursor
+Reset_GLCD_Cursor   ; Move GLCD Cursor to top left corner of GLCD
 	movlw	b'10111000'
 	call	Send_Instr
 	movlw	b'01000000'
@@ -234,18 +234,12 @@ E_Pulse
 	call	Delay
 	return
 	
-Delay	
-	movlw	b'00010000'	;   3.4 us Delay
+Delay	;   3.4 us Delay
+	movlw	b'00010000'	
 	movwf	delay_count
 dllp1	decfsz	delay_count
 	bra	dllp1
-;;	
-;	
-;;	movlw	0xFF	;   32us Delay
-;	movff	PORTJ, delay_count
-;dllp1	decfsz	delay_count
-;	bra	dllp1
-;;	
+
 ;	movlw	0xFF	
 ;	movwf	delay_count1
 ;dllp1	
