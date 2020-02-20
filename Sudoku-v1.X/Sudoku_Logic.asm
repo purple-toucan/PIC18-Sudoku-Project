@@ -1,11 +1,12 @@
 	#include p18f87k22.inc
 
-	extern write_cursor
+	extern Write_Cursor
 		
 	global	cursor_x, cursor_y
-	global	sudoku_brdplayer
+	global	sudoku_brdplayer, sudoku_brdsolution
+	global	sudoku_brdfixedp
 	global	update_game
-	
+	global	logic_setup
 	
 	
 reserve code
@@ -20,14 +21,16 @@ RIGHT	    res 1   ; RIGHT command
 LEFT	    res 1   ; LEFT command
 FIXED	    res 1   ; reserved for testing if cursor fixed
 	    
-Boards	udata	0x600 ;reserve data space for boards in bank 6
-sudoku_brdplayer res 81	;sudoku board the player is working on 
-sudoku_brdsolution  res 81  ;sudoku board full of solutions
-sudoku_brdfixedp    res 81  ;sudoku board fixed points
+Boards_RAM700	udata	0x700 ;reserve data space for boards in bank 6
+sudoku_brdplayer    res .81  ;sudoku board the player is working on  
+sudoku_brdfixedp    res .81  ;sudoku board fixed points
 
+Boards_RAM800	udata	0x800 ;reserve data space for boards in bank 6
+sudoku_brdsolution  res .81  ;sudoku board full of solutions
+    
 main	code
 
-sudoku_lsetup	; sets values for arrows
+logic_setup	; sets values for arrows
     movlw   0x41
     movwf   UP
 
@@ -40,29 +43,35 @@ sudoku_lsetup	; sets values for arrows
     movlw   0x44
     movwf   LEFT
     
+    movlw   0x04
+    movwf   cursor_x
+    movwf   cursor_y
+    
+    return
+    
     
 update_game ;	handles arrow and error controls
     movwf   W_in ;  moves w to W_in
     btfsc   W_in, 6 ;	skips next line if bit 6 of W_in is clear
-    bra	arrow_con   ;	branches to arrow control if set
-    bra	curs_fix    ;	branches to cursor fixing if clear
+    bra	    arrow_con   ;	branches to arrow control if set
+    bra	    curs_fix    ;	branches to cursor fixing if clear
     
 arrow_con   ;	arrow command controls
     cpfseq  UP	;   compare wreg to up command
-    bra Down	; pass branch to down
-    bra go_up
+    bra	    Down	; pass branch to down
+    bra	    go_up
 Down
     cpfseq  DOWN ; compare wreg to down. skip if =
-    bra Right	
-    bra go_down
+    bra	    Right	
+    bra	    go_down
 Right
     cpfseq  RIGHT
-    bra Left
-    bra go_right
+    bra	    Left
+    bra	    go_right
 Left
     cpfseq  LEFT
     nop
-    bra go_left
+    bra	    go_left
     
 end_return
     return
@@ -70,38 +79,43 @@ end_return
 go_up
     movlw   0x00
     cpfseq  cursor_x ;	check if cursor is at boundary
-    bra end_return
-    call    write_cursor
+    bra	    go_up_con
+    bra	    end_return
+go_up_con
+    call    Write_Cursor
     decf    cursor_x, f ; move cursor
-    
-    bra end_return
+    bra	    end_return
     
 go_down
     movlw   0x08
     cpfseq  cursor_x ;	check if cursor is at boundary
-    bra end_return
-    call    write_cursor
+    bra	    go_down_con
+    bra	    end_return
+go_down_con
+    call    Write_Cursor
     incf    cursor_x, f
-    
-    bra end_return
+    bra	    end_return
     
 go_right
     movlw   0x08
     cpfseq  cursor_y ;	check if cursor is at boundary
-    bra	end_return
-    call    write_cursor
+    bra	    go_right_con
+    bra	    end_return
+go_right_con
+    call    Write_Cursor
     incf    cursor_y, f
-    
-    bra end_return
+    bra	    end_return
 
 go_left
     movlw   0x00
     cpfseq  cursor_y ;	check if cursor is at boundary
-    bra end_return
-    call    write_cursor
-    incf    cursor_y, f
+    bra	    go_left_con
+    bra	    end_return
+go_left_con
+    call    Write_Cursor
+    decf    cursor_y, f
     
-    bra end_return
+    bra	    end_return
     
 curs_fix    ;	determining if cursor is fixed or not
     lfsr    0, sudoku_brdfixedp	;   loading fixed position sudoku onto FSR0
@@ -119,7 +133,7 @@ curs_fix    ;	determining if cursor is fixed or not
     lfsr    0, sudoku_brdplayer	;   loading player board onto FSR0
     
     movlw   0x09
-    mulwf   cursor_x	
+    mulwf   cursor_x
     
     movf    cursor_y, w
     addwf   PRODL, w	;   offset is now loaded into wreg    

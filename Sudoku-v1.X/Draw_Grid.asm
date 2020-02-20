@@ -1,6 +1,6 @@
 #include p18f87k22.inc
 	
-	extern Set_Cursor_X, Set_Cursor_Y
+	extern Set_GLCD_Cursor_X, Set_GLCD_Cursor_Y
 	extern Send_Data
 	
 	global Draw_Grid
@@ -87,9 +87,9 @@ Draw_Grid
 Draw_Grid_Row
 	
 	movf	current_row, w	; Set Cursor
-	call	Set_Cursor_X
+	call	Set_GLCD_Cursor_X
 	movlw	0x00
-	call	Set_Cursor_Y
+	call	Set_GLCD_Cursor_Y
 	
 	movlw	0x00	
 	call	Send_Data	; Draw Padding

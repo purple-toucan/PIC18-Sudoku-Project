@@ -2,15 +2,12 @@
 
 	extern Set_GLCD_Cursor_X, Set_GLCD_Cursor_Y
 	extern Write_Block, Read_Block
-	
 	extern cursor_x, cursor_y
-	
-	extern sudoku_brbplayer
+	extern sudoku_brdplayer
 	
 	global Write_Cell, Write_Cells_Setup
 	global number_name
 	global sudoku_x, sudoku_y
-	
 	global Write_Cursor
 	
 	
@@ -42,20 +39,24 @@ X_LMask_Table_PM  data 0xFF,0xFF,0xF0, 0xF0,0xFC,0xFF, 0xFF,0xFF,0xF0
 	    constant    X_LMask_Table_length = 9
 	    
 ;Shapes_PM   data 0,0,0,0,0, 0,0x40,0x7C,0,0, 0xB8,0xA8,0xA8,0xA8,0xE8, 0x88,0x88,0xA8,0xA8,0xF8, 0xE0,0x20,0x20,0x20,0xF8 ,0xE8,0xA8,0xA8,0xA8,0xB8, 0xF8,0xA8,0xA8,0xA8,0xB8, 0x80,0x80,0x98,0xA0,0xC0, 0xF8,0xA8,0xA8,0xA8,0xF8, 0xE8,0xA8,0xA8,0xA8,0xF8
-Shapes_PM1   data    0x00,0x00,0x00,0x00,0x00, 0x00,0x12,0x1F,0x10,0x00, 0x1D,0x15,0x15,0x15,0x17, 0x11,0x11,0x15,0x15,0x1F, 0x07,0x04,0x04,0x04,0x1F, 0x17,0x15,0x15,0x15,0x1D
-Shapes_PM2   data    0x1F,0x15,0x15,0x15,0x1D, 0x01,0x01,0x19,0x05,0x03, 0x1F,0x15,0x15,0x15,0x1F, 0x17,0x15,0x15,0x15,0x1F, 0x1F,0x1F,0x1F,0x1F,0x1F
+Shapes_PM1   data   0x00,0x00,0x00,0x00,0x00, 0x00,0x12,0x1F,0x10,0x00, 0x1D,0x15,0x15,0x15,0x17
+Shapes_PM2   data   0x11,0x11,0x15,0x15,0x1F, 0x07,0x04,0x04,0x04,0x1F, 0x17,0x15,0x15,0x15,0x1D
+Shapes_PM3   data   0x1F,0x15,0x15,0x15,0x1D, 0x01,0x01,0x19,0x05,0x03, 0x1F,0x15,0x15,0x15,0x1F
+Shapes_PM4   data   0x17,0x15,0x15,0x15,0x1F, 0x1F,0x1F,0x1F,0x1F,0x1F
    ; 5 bytes of storage for shape paterns for each digit 0-9 and one solid block
-	    constant	Shape_Table1_length = 30
-	    constant	Shape_Table2_length = 25
+	    constant	Shape_Table1_length = .15
+	    constant	Shape_Table2_length = .15
+	    constant	Shape_Table3_length = .15
+	    constant	Shape_Table4_length = .10
    
-Tables	udata	0x400    ; reserve data anywhere in RAM (here at 0x400)
+Write_Cells_RAM400	udata	0x400    ; reserve data anywhere in RAM (here at 0x400)
 Y_Table		res Y_Table_length    ; reserve 9 bytes for Column Look Up Table
 X_Table		res X_Table_length	; reserve 27 bytes for Row Look Up Table
 X_UMask_Table	res X_UMask_Table_length ; Mask storage
 X_LMask_Table	res X_LMask_Table_length ; Mask storage
 
-Tables2	udata	0x500    ; reserve data anywhere in RAM (here at 0x400)
-Shapes_Table	res Shape_Table1_length + Shape_Table2_length
+Write_Cells_RAM500	udata	0x500    ; reserve data anywhere in RAM (here at 0x400)
+Shapes_Table	res Shape_Table1_length + Shape_Table2_length + Shape_Table3_length + Shape_Table4_length
 	
 acs0	    udata_acs
 number_name res 1   ; Variables to be accessed from external programs
@@ -178,6 +179,34 @@ S2rdlp 	tblrd*+			; one byte from PM to TABLAT, increment TBLPRT
 	decfsz	Reading_Counter	; count down to zero
 	bra	S2rdlp		; keep going until finished	
 	
+	movlw	upper(Shapes_PM3)	; address of data in PM
+	movwf	TBLPTRU		; load upper bits to TBLPTRU
+	movlw	high(Shapes_PM3)	; address of data in PM
+	movwf	TBLPTRH		; load high byte to TBLPTRH
+	movlw	low(Shapes_PM3)	; address of data in PM
+	movwf	TBLPTRL		; load low byte to TBLPTRL
+	movlw	Shape_Table3_length	; bytes to read
+	movwf 	Reading_Counter	; our counter register
+S3rdlp 	tblrd*+			; one byte from PM to TABLAT, increment TBLPRT
+	movff	TABLAT, POSTINC0; move data from TABLAT to (FSR0), inc FSR0	
+	tblrd*+	
+	decfsz	Reading_Counter	; count down to zero
+	bra	S3rdlp		; keep going until finished	
+	
+	movlw	upper(Shapes_PM4)	; address of data in PM
+	movwf	TBLPTRU		; load upper bits to TBLPTRU
+	movlw	high(Shapes_PM4)	; address of data in PM
+	movwf	TBLPTRH		; load high byte to TBLPTRH
+	movlw	low(Shapes_PM4)	; address of data in PM
+	movwf	TBLPTRL		; load low byte to TBLPTRL
+	movlw	Shape_Table4_length	; bytes to read
+	movwf 	Reading_Counter	; our counter register
+S4rdlp 	tblrd*+			; one byte from PM to TABLAT, increment TBLPRT
+	movff	TABLAT, POSTINC0; move data from TABLAT to (FSR0), inc FSR0	
+	tblrd*+	
+	decfsz	Reading_Counter	; count down to zero
+	bra	S4rdlp		; keep going until finished	
+	
 	return
 	
 Write_Cursor
@@ -194,11 +223,12 @@ Write_Cursor
 	
 wrt_true_val	;find true value of cursor cell by indexing suduko board
 	
-	lfsr	0, sudoku_brbplayer
+	lfsr	FSR0, sudoku_brdplayer
 	
 	movlw	0x09
-	mulwf	cursor_x, w
-	addwf	cursor_y, w ;find index position of cursor cell within suduko
+	mulwf	cursor_x
+	movf    cursor_y, w
+	addwf   PRODL, w ;find index position of cursor cell within suduko
 	
 	movff	PLUSW0, number_name ;find cursor value
 	

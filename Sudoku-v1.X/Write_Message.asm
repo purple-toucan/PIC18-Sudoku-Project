@@ -1,5 +1,5 @@
-#include p18f87k22.inc
-;
+    #include p18f87k22.inc
+
 	extern Set_GLCD_Cursor_X, Set_GLCD_Cursor_Y
 	extern Write_Block_2
 	
@@ -28,10 +28,10 @@ N_PM data 0x7C,0x08,0x10,0x7C
 G_PM data 0x38,0x44,0x54,0x30
 	constant    G_length = 4
 	
-Tables2	udata_acs    ; reserve data anywhere in RAM (here at 0x400)
+vars	udata_acs    ; reserve data anywhere in RAM (here at 0x400)
 counter res 1
 	
-Tables2	udata	0x300    ; reserve data anywhere in RAM (here at 0x400)
+Write_Message_RAM300	udata	0x300    ; reserve data anywhere in RAM (here at 0x400)
 row_message	res .64
 	
 Main	code

@@ -57,17 +57,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=GLCD.asm KeyPad.asm Main.asm Write_Cells.asm config.asm Draw_Grid.asm
+SOURCEFILES_QUOTED_IF_SPACED=config.asm KeyPad.asm GLCD.asm Write_Cells.asm Main.asm Draw_Grid.asm Sudoku_Logic.asm Board_Validation.asm Write_Message.asm Sudoku_Setup.asm
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/GLCD.o ${OBJECTDIR}/KeyPad.o ${OBJECTDIR}/Main.o ${OBJECTDIR}/Write_Cells.o ${OBJECTDIR}/config.o ${OBJECTDIR}/Draw_Grid.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/GLCD.o.d ${OBJECTDIR}/KeyPad.o.d ${OBJECTDIR}/Main.o.d ${OBJECTDIR}/Write_Cells.o.d ${OBJECTDIR}/config.o.d ${OBJECTDIR}/Draw_Grid.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/config.o ${OBJECTDIR}/KeyPad.o ${OBJECTDIR}/GLCD.o ${OBJECTDIR}/Write_Cells.o ${OBJECTDIR}/Main.o ${OBJECTDIR}/Draw_Grid.o ${OBJECTDIR}/Sudoku_Logic.o ${OBJECTDIR}/Board_Validation.o ${OBJECTDIR}/Write_Message.o ${OBJECTDIR}/Sudoku_Setup.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/config.o.d ${OBJECTDIR}/KeyPad.o.d ${OBJECTDIR}/GLCD.o.d ${OBJECTDIR}/Write_Cells.o.d ${OBJECTDIR}/Main.o.d ${OBJECTDIR}/Draw_Grid.o.d ${OBJECTDIR}/Sudoku_Logic.o.d ${OBJECTDIR}/Board_Validation.o.d ${OBJECTDIR}/Write_Message.o.d ${OBJECTDIR}/Sudoku_Setup.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/GLCD.o ${OBJECTDIR}/KeyPad.o ${OBJECTDIR}/Main.o ${OBJECTDIR}/Write_Cells.o ${OBJECTDIR}/config.o ${OBJECTDIR}/Draw_Grid.o
+OBJECTFILES=${OBJECTDIR}/config.o ${OBJECTDIR}/KeyPad.o ${OBJECTDIR}/GLCD.o ${OBJECTDIR}/Write_Cells.o ${OBJECTDIR}/Main.o ${OBJECTDIR}/Draw_Grid.o ${OBJECTDIR}/Sudoku_Logic.o ${OBJECTDIR}/Board_Validation.o ${OBJECTDIR}/Write_Message.o ${OBJECTDIR}/Sudoku_Setup.o
 
 # Source Files
-SOURCEFILES=GLCD.asm KeyPad.asm Main.asm Write_Cells.asm config.asm Draw_Grid.asm
+SOURCEFILES=config.asm KeyPad.asm GLCD.asm Write_Cells.asm Main.asm Draw_Grid.asm Sudoku_Logic.asm Board_Validation.asm Write_Message.asm Sudoku_Setup.asm
 
 
 CFLAGS=
@@ -94,13 +94,13 @@ MP_LINKER_DEBUG_OPTION=
 # ------------------------------------------------------------------------------------
 # Rules for buildStep: assemble
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
-${OBJECTDIR}/GLCD.o: GLCD.asm  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/config.o: config.asm  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/GLCD.o.d 
-	@${RM} ${OBJECTDIR}/GLCD.o 
-	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/GLCD.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -d__DEBUG -d__MPLAB_DEBUGGER_ICD3=1 -q -p$(MP_PROCESSOR_OPTION)  -l\"${OBJECTDIR}/GLCD.lst\" -e\"${OBJECTDIR}/GLCD.err\" $(ASM_OPTIONS)    -o\"${OBJECTDIR}/GLCD.o\" \"GLCD.asm\" 
-	@${DEP_GEN} -d "${OBJECTDIR}/GLCD.o"
-	@${FIXDEPS} "${OBJECTDIR}/GLCD.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
+	@${RM} ${OBJECTDIR}/config.o.d 
+	@${RM} ${OBJECTDIR}/config.o 
+	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/config.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -d__DEBUG -d__MPLAB_DEBUGGER_ICD3=1 -q -p$(MP_PROCESSOR_OPTION)  -l\"${OBJECTDIR}/config.lst\" -e\"${OBJECTDIR}/config.err\" $(ASM_OPTIONS)    -o\"${OBJECTDIR}/config.o\" \"config.asm\" 
+	@${DEP_GEN} -d "${OBJECTDIR}/config.o"
+	@${FIXDEPS} "${OBJECTDIR}/config.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
 	
 ${OBJECTDIR}/KeyPad.o: KeyPad.asm  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
@@ -110,13 +110,13 @@ ${OBJECTDIR}/KeyPad.o: KeyPad.asm  nbproject/Makefile-${CND_CONF}.mk
 	@${DEP_GEN} -d "${OBJECTDIR}/KeyPad.o"
 	@${FIXDEPS} "${OBJECTDIR}/KeyPad.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
 	
-${OBJECTDIR}/Main.o: Main.asm  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/GLCD.o: GLCD.asm  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/Main.o.d 
-	@${RM} ${OBJECTDIR}/Main.o 
-	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/Main.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -d__DEBUG -d__MPLAB_DEBUGGER_ICD3=1 -q -p$(MP_PROCESSOR_OPTION)  -l\"${OBJECTDIR}/Main.lst\" -e\"${OBJECTDIR}/Main.err\" $(ASM_OPTIONS)    -o\"${OBJECTDIR}/Main.o\" \"Main.asm\" 
-	@${DEP_GEN} -d "${OBJECTDIR}/Main.o"
-	@${FIXDEPS} "${OBJECTDIR}/Main.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
+	@${RM} ${OBJECTDIR}/GLCD.o.d 
+	@${RM} ${OBJECTDIR}/GLCD.o 
+	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/GLCD.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -d__DEBUG -d__MPLAB_DEBUGGER_ICD3=1 -q -p$(MP_PROCESSOR_OPTION)  -l\"${OBJECTDIR}/GLCD.lst\" -e\"${OBJECTDIR}/GLCD.err\" $(ASM_OPTIONS)    -o\"${OBJECTDIR}/GLCD.o\" \"GLCD.asm\" 
+	@${DEP_GEN} -d "${OBJECTDIR}/GLCD.o"
+	@${FIXDEPS} "${OBJECTDIR}/GLCD.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
 	
 ${OBJECTDIR}/Write_Cells.o: Write_Cells.asm  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
@@ -126,13 +126,13 @@ ${OBJECTDIR}/Write_Cells.o: Write_Cells.asm  nbproject/Makefile-${CND_CONF}.mk
 	@${DEP_GEN} -d "${OBJECTDIR}/Write_Cells.o"
 	@${FIXDEPS} "${OBJECTDIR}/Write_Cells.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
 	
-${OBJECTDIR}/config.o: config.asm  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/Main.o: Main.asm  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/config.o.d 
-	@${RM} ${OBJECTDIR}/config.o 
-	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/config.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -d__DEBUG -d__MPLAB_DEBUGGER_ICD3=1 -q -p$(MP_PROCESSOR_OPTION)  -l\"${OBJECTDIR}/config.lst\" -e\"${OBJECTDIR}/config.err\" $(ASM_OPTIONS)    -o\"${OBJECTDIR}/config.o\" \"config.asm\" 
-	@${DEP_GEN} -d "${OBJECTDIR}/config.o"
-	@${FIXDEPS} "${OBJECTDIR}/config.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
+	@${RM} ${OBJECTDIR}/Main.o.d 
+	@${RM} ${OBJECTDIR}/Main.o 
+	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/Main.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -d__DEBUG -d__MPLAB_DEBUGGER_ICD3=1 -q -p$(MP_PROCESSOR_OPTION)  -l\"${OBJECTDIR}/Main.lst\" -e\"${OBJECTDIR}/Main.err\" $(ASM_OPTIONS)    -o\"${OBJECTDIR}/Main.o\" \"Main.asm\" 
+	@${DEP_GEN} -d "${OBJECTDIR}/Main.o"
+	@${FIXDEPS} "${OBJECTDIR}/Main.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
 	
 ${OBJECTDIR}/Draw_Grid.o: Draw_Grid.asm  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
@@ -142,14 +142,46 @@ ${OBJECTDIR}/Draw_Grid.o: Draw_Grid.asm  nbproject/Makefile-${CND_CONF}.mk
 	@${DEP_GEN} -d "${OBJECTDIR}/Draw_Grid.o"
 	@${FIXDEPS} "${OBJECTDIR}/Draw_Grid.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
 	
-else
-${OBJECTDIR}/GLCD.o: GLCD.asm  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/Sudoku_Logic.o: Sudoku_Logic.asm  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/GLCD.o.d 
-	@${RM} ${OBJECTDIR}/GLCD.o 
-	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/GLCD.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -q -p$(MP_PROCESSOR_OPTION)  -l\"${OBJECTDIR}/GLCD.lst\" -e\"${OBJECTDIR}/GLCD.err\" $(ASM_OPTIONS)    -o\"${OBJECTDIR}/GLCD.o\" \"GLCD.asm\" 
-	@${DEP_GEN} -d "${OBJECTDIR}/GLCD.o"
-	@${FIXDEPS} "${OBJECTDIR}/GLCD.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
+	@${RM} ${OBJECTDIR}/Sudoku_Logic.o.d 
+	@${RM} ${OBJECTDIR}/Sudoku_Logic.o 
+	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/Sudoku_Logic.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -d__DEBUG -d__MPLAB_DEBUGGER_ICD3=1 -q -p$(MP_PROCESSOR_OPTION)  -l\"${OBJECTDIR}/Sudoku_Logic.lst\" -e\"${OBJECTDIR}/Sudoku_Logic.err\" $(ASM_OPTIONS)    -o\"${OBJECTDIR}/Sudoku_Logic.o\" \"Sudoku_Logic.asm\" 
+	@${DEP_GEN} -d "${OBJECTDIR}/Sudoku_Logic.o"
+	@${FIXDEPS} "${OBJECTDIR}/Sudoku_Logic.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
+	
+${OBJECTDIR}/Board_Validation.o: Board_Validation.asm  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/Board_Validation.o.d 
+	@${RM} ${OBJECTDIR}/Board_Validation.o 
+	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/Board_Validation.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -d__DEBUG -d__MPLAB_DEBUGGER_ICD3=1 -q -p$(MP_PROCESSOR_OPTION)  -l\"${OBJECTDIR}/Board_Validation.lst\" -e\"${OBJECTDIR}/Board_Validation.err\" $(ASM_OPTIONS)    -o\"${OBJECTDIR}/Board_Validation.o\" \"Board_Validation.asm\" 
+	@${DEP_GEN} -d "${OBJECTDIR}/Board_Validation.o"
+	@${FIXDEPS} "${OBJECTDIR}/Board_Validation.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
+	
+${OBJECTDIR}/Write_Message.o: Write_Message.asm  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/Write_Message.o.d 
+	@${RM} ${OBJECTDIR}/Write_Message.o 
+	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/Write_Message.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -d__DEBUG -d__MPLAB_DEBUGGER_ICD3=1 -q -p$(MP_PROCESSOR_OPTION)  -l\"${OBJECTDIR}/Write_Message.lst\" -e\"${OBJECTDIR}/Write_Message.err\" $(ASM_OPTIONS)    -o\"${OBJECTDIR}/Write_Message.o\" \"Write_Message.asm\" 
+	@${DEP_GEN} -d "${OBJECTDIR}/Write_Message.o"
+	@${FIXDEPS} "${OBJECTDIR}/Write_Message.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
+	
+${OBJECTDIR}/Sudoku_Setup.o: Sudoku_Setup.asm  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/Sudoku_Setup.o.d 
+	@${RM} ${OBJECTDIR}/Sudoku_Setup.o 
+	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/Sudoku_Setup.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -d__DEBUG -d__MPLAB_DEBUGGER_ICD3=1 -q -p$(MP_PROCESSOR_OPTION)  -l\"${OBJECTDIR}/Sudoku_Setup.lst\" -e\"${OBJECTDIR}/Sudoku_Setup.err\" $(ASM_OPTIONS)    -o\"${OBJECTDIR}/Sudoku_Setup.o\" \"Sudoku_Setup.asm\" 
+	@${DEP_GEN} -d "${OBJECTDIR}/Sudoku_Setup.o"
+	@${FIXDEPS} "${OBJECTDIR}/Sudoku_Setup.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
+	
+else
+${OBJECTDIR}/config.o: config.asm  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/config.o.d 
+	@${RM} ${OBJECTDIR}/config.o 
+	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/config.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -q -p$(MP_PROCESSOR_OPTION)  -l\"${OBJECTDIR}/config.lst\" -e\"${OBJECTDIR}/config.err\" $(ASM_OPTIONS)    -o\"${OBJECTDIR}/config.o\" \"config.asm\" 
+	@${DEP_GEN} -d "${OBJECTDIR}/config.o"
+	@${FIXDEPS} "${OBJECTDIR}/config.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
 	
 ${OBJECTDIR}/KeyPad.o: KeyPad.asm  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
@@ -159,13 +191,13 @@ ${OBJECTDIR}/KeyPad.o: KeyPad.asm  nbproject/Makefile-${CND_CONF}.mk
 	@${DEP_GEN} -d "${OBJECTDIR}/KeyPad.o"
 	@${FIXDEPS} "${OBJECTDIR}/KeyPad.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
 	
-${OBJECTDIR}/Main.o: Main.asm  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/GLCD.o: GLCD.asm  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/Main.o.d 
-	@${RM} ${OBJECTDIR}/Main.o 
-	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/Main.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -q -p$(MP_PROCESSOR_OPTION)  -l\"${OBJECTDIR}/Main.lst\" -e\"${OBJECTDIR}/Main.err\" $(ASM_OPTIONS)    -o\"${OBJECTDIR}/Main.o\" \"Main.asm\" 
-	@${DEP_GEN} -d "${OBJECTDIR}/Main.o"
-	@${FIXDEPS} "${OBJECTDIR}/Main.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
+	@${RM} ${OBJECTDIR}/GLCD.o.d 
+	@${RM} ${OBJECTDIR}/GLCD.o 
+	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/GLCD.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -q -p$(MP_PROCESSOR_OPTION)  -l\"${OBJECTDIR}/GLCD.lst\" -e\"${OBJECTDIR}/GLCD.err\" $(ASM_OPTIONS)    -o\"${OBJECTDIR}/GLCD.o\" \"GLCD.asm\" 
+	@${DEP_GEN} -d "${OBJECTDIR}/GLCD.o"
+	@${FIXDEPS} "${OBJECTDIR}/GLCD.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
 	
 ${OBJECTDIR}/Write_Cells.o: Write_Cells.asm  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
@@ -175,13 +207,13 @@ ${OBJECTDIR}/Write_Cells.o: Write_Cells.asm  nbproject/Makefile-${CND_CONF}.mk
 	@${DEP_GEN} -d "${OBJECTDIR}/Write_Cells.o"
 	@${FIXDEPS} "${OBJECTDIR}/Write_Cells.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
 	
-${OBJECTDIR}/config.o: config.asm  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/Main.o: Main.asm  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/config.o.d 
-	@${RM} ${OBJECTDIR}/config.o 
-	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/config.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -q -p$(MP_PROCESSOR_OPTION)  -l\"${OBJECTDIR}/config.lst\" -e\"${OBJECTDIR}/config.err\" $(ASM_OPTIONS)    -o\"${OBJECTDIR}/config.o\" \"config.asm\" 
-	@${DEP_GEN} -d "${OBJECTDIR}/config.o"
-	@${FIXDEPS} "${OBJECTDIR}/config.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
+	@${RM} ${OBJECTDIR}/Main.o.d 
+	@${RM} ${OBJECTDIR}/Main.o 
+	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/Main.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -q -p$(MP_PROCESSOR_OPTION)  -l\"${OBJECTDIR}/Main.lst\" -e\"${OBJECTDIR}/Main.err\" $(ASM_OPTIONS)    -o\"${OBJECTDIR}/Main.o\" \"Main.asm\" 
+	@${DEP_GEN} -d "${OBJECTDIR}/Main.o"
+	@${FIXDEPS} "${OBJECTDIR}/Main.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
 	
 ${OBJECTDIR}/Draw_Grid.o: Draw_Grid.asm  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
@@ -190,6 +222,38 @@ ${OBJECTDIR}/Draw_Grid.o: Draw_Grid.asm  nbproject/Makefile-${CND_CONF}.mk
 	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/Draw_Grid.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -q -p$(MP_PROCESSOR_OPTION)  -l\"${OBJECTDIR}/Draw_Grid.lst\" -e\"${OBJECTDIR}/Draw_Grid.err\" $(ASM_OPTIONS)    -o\"${OBJECTDIR}/Draw_Grid.o\" \"Draw_Grid.asm\" 
 	@${DEP_GEN} -d "${OBJECTDIR}/Draw_Grid.o"
 	@${FIXDEPS} "${OBJECTDIR}/Draw_Grid.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
+	
+${OBJECTDIR}/Sudoku_Logic.o: Sudoku_Logic.asm  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/Sudoku_Logic.o.d 
+	@${RM} ${OBJECTDIR}/Sudoku_Logic.o 
+	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/Sudoku_Logic.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -q -p$(MP_PROCESSOR_OPTION)  -l\"${OBJECTDIR}/Sudoku_Logic.lst\" -e\"${OBJECTDIR}/Sudoku_Logic.err\" $(ASM_OPTIONS)    -o\"${OBJECTDIR}/Sudoku_Logic.o\" \"Sudoku_Logic.asm\" 
+	@${DEP_GEN} -d "${OBJECTDIR}/Sudoku_Logic.o"
+	@${FIXDEPS} "${OBJECTDIR}/Sudoku_Logic.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
+	
+${OBJECTDIR}/Board_Validation.o: Board_Validation.asm  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/Board_Validation.o.d 
+	@${RM} ${OBJECTDIR}/Board_Validation.o 
+	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/Board_Validation.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -q -p$(MP_PROCESSOR_OPTION)  -l\"${OBJECTDIR}/Board_Validation.lst\" -e\"${OBJECTDIR}/Board_Validation.err\" $(ASM_OPTIONS)    -o\"${OBJECTDIR}/Board_Validation.o\" \"Board_Validation.asm\" 
+	@${DEP_GEN} -d "${OBJECTDIR}/Board_Validation.o"
+	@${FIXDEPS} "${OBJECTDIR}/Board_Validation.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
+	
+${OBJECTDIR}/Write_Message.o: Write_Message.asm  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/Write_Message.o.d 
+	@${RM} ${OBJECTDIR}/Write_Message.o 
+	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/Write_Message.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -q -p$(MP_PROCESSOR_OPTION)  -l\"${OBJECTDIR}/Write_Message.lst\" -e\"${OBJECTDIR}/Write_Message.err\" $(ASM_OPTIONS)    -o\"${OBJECTDIR}/Write_Message.o\" \"Write_Message.asm\" 
+	@${DEP_GEN} -d "${OBJECTDIR}/Write_Message.o"
+	@${FIXDEPS} "${OBJECTDIR}/Write_Message.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
+	
+${OBJECTDIR}/Sudoku_Setup.o: Sudoku_Setup.asm  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/Sudoku_Setup.o.d 
+	@${RM} ${OBJECTDIR}/Sudoku_Setup.o 
+	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/Sudoku_Setup.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -q -p$(MP_PROCESSOR_OPTION)  -l\"${OBJECTDIR}/Sudoku_Setup.lst\" -e\"${OBJECTDIR}/Sudoku_Setup.err\" $(ASM_OPTIONS)    -o\"${OBJECTDIR}/Sudoku_Setup.o\" \"Sudoku_Setup.asm\" 
+	@${DEP_GEN} -d "${OBJECTDIR}/Sudoku_Setup.o"
+	@${FIXDEPS} "${OBJECTDIR}/Sudoku_Setup.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
 	
 endif
 

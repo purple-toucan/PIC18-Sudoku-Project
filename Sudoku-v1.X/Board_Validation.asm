@@ -1,5 +1,7 @@
 	#include p18f87k22.inc
 	extern sudoku_brdplayer
+	extern sudoku_brdsolution
+	
 	global validate
 	
 	
@@ -21,27 +23,28 @@ not_full
     return
     
 invalid
-    movlw   0x00
+    movlw   0x01
     return
-loop
+    
+loop1
     tstfsz  POSTINC0	;   tests elements, skips if cell empty
     decfsz  counter ;	decrement counter by 1 for each cell
     bra	    not_full
-    bra	    loop    ;	completes loop
+    bra	    loop1    ;	completes loop
 
-validate
+
     movlw   0x51
     movwf   counter ;	setting counter to 81
     
     lfsr    0,	sudoku_brdplayer    ;	player board loading onto FSR0
     lfsr    1,	sudoku_brdsolution  ;	solution board loading onto FSR1
     
-loop
+loop2
     movf    POSTINC0, w	    ;   move cell into wreg for comparison
     cpfseq  POSTINC1	;   skips if both cells are in agreement
-    bra	    not_valid	;   branch to invalid subroutine
+    bra	    invalid	;   branch to invalid subroutine
     decfsz  counter ;	decrement counter
-    bra	    loop
+    bra	    loop2
 
     movlw	0x02	;   set w to 2
     return

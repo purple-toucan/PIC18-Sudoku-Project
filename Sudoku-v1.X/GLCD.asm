@@ -5,6 +5,7 @@
     global Test_Write_2, Test_Write
     global Send_Data
     global Write_Block, Read_Block
+    global Write_Block_2
     
 acs0	    udata_acs   ; reserve data space in access ram
 delay_count     res 1	; reserve one byte for counter in the delay 
