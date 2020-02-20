@@ -1,10 +1,4 @@
-# Microprocessors
-Repository for Physics Year 3 microprocessors lab
+# Microprocessors - Sudoku Project
 
-A simple assembly program for PIC18 microprocessor, that counts to 100, putting the current count value out onto PORTB
 
-Reads a table (message) from programme memory to data memory 
-
-Initialises UART and writes a message (the table) to UART 
-
-Initialises LCD and writes the message to the LCD
+Assembly project for PIC18 microprocessor, using an external 128x64 pixel Winstar WDG0151 GLCD and a 16 button keypad.
