@@ -1,12 +1,13 @@
 	#include p18f87k22.inc
 
-	extern	GLCD_Setup, Test_Write
-	extern	Test_Write_2, Clear_Board
+	extern	GLCD_Setup
 	extern	Draw_Grid
 	
 	extern Write_Cell, Write_Cells_Setup
 	extern number_name
 	extern sudoku_x, sudoku_y
+	
+	extern write_correct, write_wrong
 	
 acs0	    udata_acs   ; reserve data space in access ram
 game_loop_counter res 1	    

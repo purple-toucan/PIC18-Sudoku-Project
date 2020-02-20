@@ -3,6 +3,8 @@
 	extern Set_GLCD_Cursor_X, Set_GLCD_Cursor_Y
 	extern Write_Block_2
 	
+	global write_correct, write_wrong
+	
 Storage	code    ; a section of programme memory for storing data
 	; ******* myTable, data in programme memory, and its length *****
 C_PM data 0x38,0x44,0x44,0x28
