@@ -1,7 +1,7 @@
 #include p18f87k22.inc
 
     global GLCD_Setup, Clear_Board
-    global Set_Cursor_X, Set_Cursor_Y
+    global Set_GLCD_Cursor_X, Set_GLCD_Cursor_Y
     global Test_Write_2, Test_Write
     global Send_Data
     global Write_Block, Read_Block
@@ -42,9 +42,8 @@ GLCD_Setup
 	
 	bsf	LATB, GLCD_RST	; Disable Reset
 	
-	bsf	LATB, GLCD_CS2	; Right Side
+	bcf	LATB, GLCD_CS2	; Right Side
 	bcf	LATB, GLCD_CS1	; Left Side
-	
 	
 	call	Delay
 	
@@ -52,6 +51,9 @@ GLCD_Setup
 	call	Send_Instr
 	
 	call	Clear_Board  
+	
+	bsf	LATB, GLCD_CS2	; Right Side
+	bcf	LATB, GLCD_CS1	; Left Side
 	
 	return
 	
@@ -92,6 +94,18 @@ wblp	movff	POSTINC2, PORTD ; Move FSR2 value to PORTD
 	
 	return
 	
+Write_Block_2 ; Write block of length W of data from FSR2 to right hand GLCD
+	
+	bcf	LATB, GLCD_CS2	; Right Side
+	bsf	LATB, GLCD_CS1	; Left Side
+	
+	call	Write_Block
+	
+	bsf	LATB, GLCD_CS2	; Right Side
+	bcf	LATB, GLCD_CS1	; Left Side
+	
+	return
+	
 Read_Block ; Read block of length W of data from GLCD to FSR2
 	setf	TRISD
 	
@@ -120,7 +134,7 @@ rblp	bsf	LATB, GLCD_E   	; Enable Pin High
 	
 Test_Write			; Write Two Numbers to Board
 	
-	call	Reset_Cursor
+	call	Reset_GLCD_Cursor
 	
 	movlw	0x00
 	call	Send_Data
@@ -180,7 +194,7 @@ rplp	movf	test_col_count, w
 	return
 	
 	
-Reset_Cursor
+Reset_GLCD_Cursor
 	movlw	b'10111000'
 	call	Send_Instr
 	movlw	b'01000000'
@@ -188,12 +202,12 @@ Reset_Cursor
 	
 	return
 	
-Set_Cursor_X			; Move to Row W
+Set_GLCD_Cursor_X			; Move to Row W
 	iorlw	X_Instr		; Format W as Row Command
 	call	Send_Instr
 	return
 	
-Set_Cursor_Y			; Move to Column W
+Set_GLCD_Cursor_Y			; Move to Column W
 	iorlw	Y_Instr		; Format W as Column Command
 	call	Send_Instr
 	return
