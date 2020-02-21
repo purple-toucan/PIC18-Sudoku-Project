@@ -6,11 +6,14 @@
 	extern validate
 	extern update_game, logic_setup
 	extern write_correct, write_wrong
-	extern Create_Board
+	extern write_title, write_credit
+	extern Create_Board, Create_Empty_Board
 	
 acs0	    udata_acs   ; reserve data space in access ram
 game_loop_counter res 1	    
 w_store    res 1	
+delay_count1	res 1
+delay_count2    res 1 
 
     constant	loops_per_semi_flash = 0x7F
     
@@ -21,8 +24,13 @@ rst	code	0    ; reset vector
 main	code
 	; ******* Programme FLASH read Setup Code ***********************
 setup	
+	bcf	EECON1, CFGS	;Allow Reading in from PM
+	bsf	EECON1, EEPGD 	
+	
 	call	PadSetup
 	call	GLCD_Setup
+	call	write_title
+	call	write_credit
 	call	logic_setup
 	call	Write_Cells_Setup
 	call	Create_Board
@@ -31,8 +39,10 @@ setup
 	; ******* Main programme ****************************************
 start 
 	
-	
 game_loop_start
+	
+	call	Throttle
+	
 	call	Give_Input	    ; get keypad input
 	movwf	w_store
 	
@@ -96,5 +106,20 @@ correct_board_exit
 	call	write_correct		; display message and stop
 	
 	goto	$
+
+Throttle
+	movlw	0x09	
+	movwf	delay_count1
+dllp1	
+	movlw	0x0F	
+	movwf	delay_count2
+	
+dllp2	decfsz	delay_count2
+	bra	dllp2
+	
+	decfsz	delay_count1
+	bra	dllp1
+	
+	return
 
 	end

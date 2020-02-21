@@ -76,8 +76,6 @@ counter		res 1
 Main	code
  
 Write_Cells_Setup
-	bcf	EECON1, CFGS	;Allow Reading in from PM
-	bsf	EECON1, EEPGD 	
 	
 	;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Read In Y Look Up Table From PM to RAM
 	

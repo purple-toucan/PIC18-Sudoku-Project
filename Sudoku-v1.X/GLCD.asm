@@ -2,6 +2,7 @@
 
     global GLCD_Setup, Clear_Board
     global Set_GLCD_Cursor_X, Set_GLCD_Cursor_Y
+    global Set_GLCD_Cursor_X_2, Set_GLCD_Cursor_Y_2
     global Test_Write_2, Test_Write
     global Send_Data
     global Write_Block, Read_Block
@@ -53,6 +54,9 @@ GLCD_Setup
 	
 	call	Clear_Board  
 	
+	movlw	b'11000000'
+	call	Send_Instr
+	
 	bsf	LATB, GLCD_CS2	; Right Side
 	bcf	LATB, GLCD_CS1	; Left Side
 	
@@ -81,6 +85,8 @@ cclrlp	    ; Iterate Over Cols, Nested inside Row Iteration
 	bra	rclrlp	
 	
 	return
+	
+
 	
 Write_Block ; Write block of length W of data from FSR2 to GLCD
 	bsf	LATB, GLCD_RS   ; Data
@@ -211,6 +217,32 @@ Set_GLCD_Cursor_X			; Move to Row W
 Set_GLCD_Cursor_Y			; Move to Column W
 	iorlw	Y_Instr		; Format W as Column Command
 	call	Send_Instr
+	return
+	
+Set_GLCD_Cursor_X_2			; Move to Row W
+	bcf	LATB, GLCD_CS2	; Right Side
+	bsf	LATB, GLCD_CS1	; Left Side
+	
+	movwf	test_row_count
+	movlw	X_Instr		; Format Row Count as Row Command
+	iorwf	test_row_count, w
+	call	Send_Instr	; Change Row
+	
+	bsf	LATB, GLCD_CS2	; Right Side
+	bcf	LATB, GLCD_CS1	; Left Side
+	return
+	
+Set_GLCD_Cursor_Y_2			; Move to Column W
+	bcf	LATB, GLCD_CS2	; Right Side
+	bsf	LATB, GLCD_CS1	; Left Side
+	
+	movwf	test_col_count
+	movlw	Y_Instr		; Format Row Count as Row Command
+	iorwf	test_col_count, w
+	call	Send_Instr	; Change Row
+	
+	bsf	LATB, GLCD_CS2	; Right Side
+	bcf	LATB, GLCD_CS1	; Left Side
 	return
 
 Send_Data			; Send WREG as Data
