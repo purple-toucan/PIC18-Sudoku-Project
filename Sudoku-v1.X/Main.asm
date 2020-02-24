@@ -108,10 +108,10 @@ correct_board_exit
 	goto	$
 
 Throttle
-	movlw	0x09	
+	movlw	0x40	
 	movwf	delay_count1
 dllp1	
-	movlw	0x0F	
+	movlw	0xFF	
 	movwf	delay_count2
 	
 dllp2	decfsz	delay_count2
@@ -119,7 +119,6 @@ dllp2	decfsz	delay_count2
 	
 	decfsz	delay_count1
 	bra	dllp1
-	
 	return
 
 	end

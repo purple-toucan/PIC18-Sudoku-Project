@@ -70,6 +70,8 @@ Right
     bra	    go_right
     
 end_return
+    movlw   0xFF
+    call    Write_Cursor
     return
 
 go_up
